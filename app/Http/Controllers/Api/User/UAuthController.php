@@ -10,12 +10,42 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UAuthController extends Controller
 {
 
     use GeneralTrait;
 
+
+    public function editProfile(Request $request)
+    {
+        $user = User::find(Auth::guard('user-api')->user()->id);
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->address = $request->address;
+        $user->save();
+        return $this->returnData('user', $user);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = User::find(Auth::guard('user-api')->user()->id);
+        $user->password = bcrypt($request->password);
+        //check old password
+        if (!Hash::check($request->old_password, $user->password)) {
+            return $this->returnError('E001', 'بيانات الدخول غير صحيحة');
+        }
+        $user->save();
+        return $this->returnData('user', $user);
+    }
+
+    public function getProfile()
+    {
+        $user = User::find(Auth::guard('user-api')->user()->id);
+        return $this->returnData('user', $user);
+    }
     public function login(Request $request)
     {
 
@@ -99,7 +129,7 @@ class UAuthController extends Controller
     {
         $token = $request->header('authorization');
         $token = str_replace('Bearer ', '', $token);
-        
+
         if ($token) {
             try {
 

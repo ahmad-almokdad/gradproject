@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\ProviderController;
+use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\User\UAuthController;
 use App\Http\Controllers\Api\CategoriesController;
+use App\Http\Controllers\Api\Provider\ProviderController as ProviderProviderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -27,15 +30,38 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
     Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
         Route::post('/login', [AuthController::class, 'login']);
 
-        Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth.guard:admin-api');
+        Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:admin-api');
+
+        Route::post('/add-provider', [ProviderController::class, 'add_provider'])->middleware('auth:admin-api');
+        Route::get('assign-services-to-providers', [ProviderController::class, 'assignServiceToProvider'])->middleware('auth:admin-api');
+        Route::get('change-active-providers', [ProviderController::class, 'changeActiveProvider'])->middleware('auth:admin-api');
+
+        Route::post('/add-service', [ServiceController::class, 'addService']);
     });
 
     Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {
         Route::post('login', [UAuthController::class, 'login']);
         Route::post('register', [UAuthController::class, 'register']);
 
+        Route::get('/get-profile', [UAuthController::class, 'getProfile'])->middleware('auth:user-api');
+        Route::post('/edit-profile', [UAuthController::class, 'editProfile'])->middleware('auth:user-api');
+        Route::get('/get-services', [ServiceController::class, 'index']);
+        // Route::post('/edit-profile',);
+        Route::post('/change-password', [UAuthController::class, 'changePassword'])->middleware('auth:user-api');
+        Route::get('/get-providers', [ProviderProviderController::class, 'index']);
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
+
+        // Route::post('/edit-profile',);
     });
+
+    Route::group(['prefix' => 'provider', 'namespace' => 'Provider'], function () {
+        Route::post('login', [ProviderProviderController::class, 'login']);
+        // Route::post('register', [UAuthController::class, 'register']);
+        // Route::post('')
+
+        // Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
+    });
+
 
     Route::group(['prefix' => 'user', 'middleware' => 'auth.guard:user-api'], function () {
         Route::post('profile', function () {

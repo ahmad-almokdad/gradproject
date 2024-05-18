@@ -14,9 +14,13 @@ class ProviderController extends Controller
     {
         // if request has service_id get provider by service id else return all
         if ($request->service_id) {
-            $providers = Provider::where('service_id', $request->service_id)->get();
+            //i have services relation in Provider model 
+            // $providers = Provider::where('service_id', $request->service_id)->get();
+            $providers = Provider::whereHas('services', function ($query) use ($request) {
+                $query->where('service_id', $request->service_id);
+            })->get();
         } else {
-            $providers = Provider::all();
+            $providers = Provider::with('services')->all();
         }
         return response()->json([
             'status' => 200,

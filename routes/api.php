@@ -34,8 +34,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:admin-api');
 
         Route::post('/add-provider', [ProviderController::class, 'add_provider'])->middleware('auth:admin-api');
-        Route::get('assign-services-to-providers', [ProviderController::class, 'assignServiceToProvider'])->middleware('auth:admin-api');
-        Route::get('change-active-providers', [ProviderController::class, 'changeActiveProvider'])->middleware('auth:admin-api');
+        Route::post('assign-services-to-providers', [ProviderController::class, 'assignServiceToProvider'])->middleware('auth:admin-api');
+        Route::post('change-active-providers', [ProviderController::class, 'changeActiveProvider'])->middleware('auth:admin-api');
 
         Route::post('/add-service', [ServiceController::class, 'addService']);
     });

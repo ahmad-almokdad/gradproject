@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\User\UAuthController;
 use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Api\Provider\ProviderController as ProviderProviderController;
+use App\Http\Controllers\Api\User\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('/get-services', [ServiceController::class, 'index']);
         // Route::post('/edit-profile',);
         Route::post('/change-password', [UAuthController::class, 'changePassword'])->middleware('auth:user-api');
+        Route::get('orders', [OrderController::class, 'index'])->middleware('auth:user-api');
+        Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
         Route::get('/get-providers', [ProviderProviderController::class, 'index']);
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
 

@@ -12,7 +12,7 @@ class ProviderController extends Controller
 
     public function index(Request $request)
     {
-        // if request has service_id get provider by service id else return alll
+        // if request has service_id get provider by service id else return all
         if ($request->service_id) {
             $providers = Provider::where('service_id', $request->service_id)->get();
         } else {

@@ -35,6 +35,10 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'order_id');
+    }
     /**
      * The attributes that should be cast.
      *

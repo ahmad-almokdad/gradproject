@@ -12,12 +12,9 @@ class Service extends Model
 
     public function getServiceImageAttribute($value)
     {
-        // the image inside public_path('images/services')
         if (!empty($value)) {
-            // Assuming your images are stored in the 'images/services' directory
             return asset('images/services/' . $value);
         }
-        // If the value is empty, return a default or null value
         return null;
     }
 }

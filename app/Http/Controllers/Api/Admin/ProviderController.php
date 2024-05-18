@@ -20,6 +20,8 @@ class ProviderController extends Controller
                 'phone' => 'required|numeric',
                 'address' => 'required|string',
                 'password' => 'required|string',
+                'service_ids' => 'required|array',
+                'service_ids.*' => 'required|numeric'
 
             ]
         );
@@ -30,7 +32,7 @@ class ProviderController extends Controller
             ]);
         }
         //add provider
-        Provider::create([
+        $provider =  Provider::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -38,6 +40,8 @@ class ProviderController extends Controller
             'password' => bcrypt($request->password),
             'status' => 1,
         ]);
+        $serviceIds = $request->service_ids;
+        $provider->services()->sync($serviceIds);
         return response()->json([
             'status' => 200,
             'message' => 'Provider added successfully',

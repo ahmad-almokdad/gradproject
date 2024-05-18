@@ -20,7 +20,8 @@ class ProviderController extends Controller
                 $query->where('service_id', $request->service_id);
             })->get();
         } else {
-            $providers = Provider::with('services')->all();
+            //get all with services
+            $providers = Provider::with('services')->get();
         }
         return response()->json([
             'status' => 200,

@@ -12,7 +12,6 @@ class ProviderController extends Controller
 
     public function index(Request $request)
     {
-        return 'e';
         // if request has service_id get provider by service id else return all
         if ($request->service_id) {
             //i have services relation in Provider model 

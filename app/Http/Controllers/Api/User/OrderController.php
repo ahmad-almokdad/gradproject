@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 class OrderController extends Controller
 {
 
-
     public function store(Request $request)
     {
         $validate = Validator::make(
@@ -20,6 +19,8 @@ class OrderController extends Controller
                 'provider_id' => 'required|string',
                 'schedule_date' => 'required|date',
                 'problem_description' => 'required',
+                'lat' => 'required|numeric',
+                'long' => 'required|numeric',
                 'images' => 'required',
                 'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]
@@ -37,7 +38,8 @@ class OrderController extends Controller
             'schedule_date' => $request->schedule_date,
             'problem_description' => $request->problem_description,
             'user_id' => $user->id,
-
+            'lat' => $request->lat,
+            'long' => $request->long,
         ]);
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
@@ -53,7 +55,6 @@ class OrderController extends Controller
             'message' => 'Order Created Successfully',
         ]);
     }
-
     public function index()
     {
         $user = auth('user-api')->user();
@@ -63,4 +64,17 @@ class OrderController extends Controller
             'orders' => $orders,
         ]);
     }
+    public function approve_order(Request $request)
+    {
+        $user = auth('user-api')->user();
+        $order = $user->orders->where('id', $request->order_id)->first();
+        $order->approve_status = 'approved';
+        $order->save();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Order Approved Successfully',
+        ]);
+
+    }
+    
 }

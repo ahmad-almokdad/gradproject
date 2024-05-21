@@ -15,4 +15,8 @@ class Provider extends Model
     {
         return $this->belongsToMany(Service::class, 'services_providers');
     }
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'provider_id');
+    }
 }

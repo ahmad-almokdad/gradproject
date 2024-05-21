@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\ProviderController;
 use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\User\UAuthController;
 use App\Http\Controllers\Api\CategoriesController;
+use App\Http\Controllers\Api\Provider\OrderController as ProviderOrderController;
 use App\Http\Controllers\Api\Provider\ProviderController as ProviderProviderController;
 use App\Http\Controllers\Api\User\OrderController;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
     Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
         Route::post('/login', [AuthController::class, 'login']);
-
+        
         Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:admin-api');
 
         Route::post('/add-provider', [ProviderController::class, 'add_provider'])->middleware('auth:admin-api');
@@ -51,6 +52,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/change-password', [UAuthController::class, 'changePassword'])->middleware('auth:user-api');
         Route::get('orders', [OrderController::class, 'index'])->middleware('auth:user-api');
         Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
+        Route::post('orders/approve', [OrderController::class, 'approve_order'])->middleware('auth:user-api');
         Route::get('/get-providers', [ProviderProviderController::class, 'index']);
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
 
@@ -59,6 +61,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
     Route::group(['prefix' => 'provider', 'namespace' => 'Provider'], function () {
         Route::post('login', [ProviderProviderController::class, 'login']);
+        Route::post('add-price', [ProviderOrderController::class, 'addPriceToOrder'])->middleware('auth:provider');
         // Route::post('register', [UAuthController::class, 'register']);
         // Route::post('')
 

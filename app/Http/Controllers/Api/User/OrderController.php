@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
@@ -66,15 +68,100 @@ class OrderController extends Controller
     }
     public function approve_order(Request $request)
     {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'iban' => 'required',
+                'order_id' => 'required',
+            ]
+        );
+        if ($validate->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validate->errors(),
+            ]);
+        }
         $user = auth('user-api')->user();
         $order = $user->orders->where('id', $request->order_id)->first();
+        if (!$order) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Order Approved Successfully',
+            ], 400);
+        }
+        $body = [
+            'amount' => $order->total_amount,
+            'iban' => $request->iban,
+        ];
+        $response = Http::post('http://localhost:8007/request-payment', $body);
+        $res_data =  json_decode($response->body(), true);
+        if ($res_data['error'] != 0) {
+            return response()->json([
+                'message' => $res_data['message'],
+            ], 400);
+        }
+
+      
+        OrderTransaction::create([
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'transaction_num' => $res_data['transaction_num'],
+            'amount' => $order->total_amount,
+        ]);
+        return response()->json([
+            'status' => 200,
+            'transaction_num' => $res_data['transaction_num'],
+            'amount' => $order->total_amount,
+            'message' => 'make payment request successfully',
+        ]);
+    }
+
+    public function approve_payment_order(Request $request)
+    {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'transaction_num' => 'required',
+                'otp' => 'required',
+            ]
+        );
+        if ($validate->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validate->errors(),
+            ]);
+        }
+        $order_transaction = OrderTransaction::where('transaction_num', $request->transaction_num)->first();
+        if (!$order_transaction) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'not found transaction order'
+            ], 400);
+        }
+        $body = [
+            'transaction_num' => $request->transaction_num,
+            'otp' => $request->otp,
+        ];
+        $response = Http::post('http://localhost:8007/confirm-payment', $body);
+        $res_data =  json_decode($response->body(), true);
+        if ($res_data['error'] != 0) {
+            return response()->json([
+                'message' => $res_data['message'],
+            ], 400);
+        }
+        $order = Order::where('id', $order_transaction->order_id)->first();
+        if (!$order) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'not found  order'
+            ], 400);
+        }
+        $order->payment_status = 'paid';
         $order->approve_status = 'approved';
         $order->save();
         return response()->json([
             'status' => 200,
-            'message' => 'Order Approved Successfully',
+            'message' => 'order approved and paid successfully',
         ]);
-
     }
-    
 }

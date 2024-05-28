@@ -7,7 +7,9 @@ use App\Http\Controllers\Api\User\UAuthController;
 use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Api\Provider\OrderController as ProviderOrderController;
 use App\Http\Controllers\Api\Provider\ProviderController as ProviderProviderController;
+use App\Http\Controllers\Api\User\FavoriteController;
 use App\Http\Controllers\Api\User\OrderController;
+use App\Http\Controllers\Api\User\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -52,10 +54,18 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/change-password', [UAuthController::class, 'changePassword'])->middleware('auth:user-api');
         Route::get('orders', [OrderController::class, 'index'])->middleware('auth:user-api');
         Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
-        Route::post('orders/approve', [OrderController::class, 'approve_order'])->middleware('auth:user-api');
+        Route::post('orders/request-payment', [OrderController::class, 'approve_order'])->middleware(['auth:user-api','throttle:5,5']);
+        Route::post('orders/confirm-payment', [OrderController::class, 'approve_payment_order'])->middleware(['auth:user-api','throttle:3,5']);
         Route::get('/get-providers', [ProviderProviderController::class, 'index']);
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
 
+
+        //!
+        Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
+        Route::post('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
+        Route::post('add-review', [ReviewController::class, 'CreateReviewRating'])->middleware('auth:user-api');
+        Route::post('/review/store', [ReviewController::class, 'store'])->middleware('auth:user-api');
+        //!
         // Route::post('/edit-profile',);
     });
 

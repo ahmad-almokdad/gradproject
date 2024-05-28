@@ -39,6 +39,33 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Order::class, 'user_id');
     }
+    public function favorites(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(favorites::class,"user_id","id");
+    }
+
+    public function providers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Provider::class,"id");
+    }
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(review::class,"user_id","id");
+    }
+
+
+    public function favorite_providers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            Provider::class,
+            "favorites",
+            "user_id",
+            "provider_id",
+            "id",
+            "id",
+        );
+    }
     /**
      * The attributes that should be cast.
      *

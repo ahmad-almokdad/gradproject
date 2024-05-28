@@ -33,8 +33,8 @@ class FavoriteController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'provider_id' => 'required|string',
-                'user_id' => 'required|string'
+                'provider_id' => 'required',
+                'user_id' => 'required'
             ]
         );
 

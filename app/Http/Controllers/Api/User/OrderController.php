@@ -96,8 +96,8 @@ class OrderController extends Controller
             'amount' => $order->total_amount,
             'iban' => $request->iban,
         ];
-        $response = Http::post('http://localhost:8007/request-payment', $body);
-        return $response->body();
+        $response = Http::post('http://localhost:8007/api/request-payment', $body);
+        // return $response->body();
         $res_data =  json_decode($response->body(), true);
         if ($res_data['error'] != 0) {
             return response()->json([
@@ -146,7 +146,7 @@ class OrderController extends Controller
             'transaction_num' => $request->transaction_num,
             'otp' => $request->otp,
         ];
-        $response = Http::post('http://localhost:8007/confirm-payment', $body);
+        $response = Http::post('http://localhost:8007/api/confirm-payment', $body);
         $res_data =  json_decode($response->body(), true);
         if ($res_data['error'] != 0) {
             return response()->json([

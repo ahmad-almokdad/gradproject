@@ -96,7 +96,7 @@ class OrderController extends Controller
             'amount' => $order->total_amount,
             'iban' => $request->iban,
         ];
-        $response = Http::post('http://localhost:8007/api/request-payment', $body);
+       return $response = Http::post('http://localhost:8007/api/request-payment', $body);
         // return $response->body();
         $res_data =  json_decode($response->body(), true);
         if ($res_data['error'] != 0) {

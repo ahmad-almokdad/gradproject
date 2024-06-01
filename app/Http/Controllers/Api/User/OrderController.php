@@ -62,6 +62,7 @@ class OrderController extends Controller
         $user = auth('user-api')->user();
         // $orders = $user->orders;
         // $orders = $orders->with('service')->with('provider')->get();
+       
         $orders = $user->load(['orders.service', 'orders.provider']);
         return response()->json([
             'status' => 200,
@@ -96,6 +97,7 @@ class OrderController extends Controller
             'iban' => $request->iban,
         ];
         $response = Http::post('http://localhost:8007/request-payment', $body);
+        return $response->body();
         $res_data =  json_decode($response->body(), true);
         if ($res_data['error'] != 0) {
             return response()->json([

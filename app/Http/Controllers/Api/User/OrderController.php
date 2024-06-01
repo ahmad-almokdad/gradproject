@@ -98,7 +98,7 @@ class OrderController extends Controller
         ];
         $response = Http::post('http://localhost:8007/api/request-payment', $body);
         // return $response->body();
-        $res_data =  json_decode($response->body(), true);
+        return $res_data =  json_decode($response->body(), true);
         if ($res_data['error'] != 0) {
             return response()->json([
                 'message' => $res_data['message'],

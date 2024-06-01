@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProviderController extends Controller
@@ -62,8 +63,13 @@ class ProviderController extends Controller
         }
 
 
-        $provider->tokens()->delete();
-        $token = $provider->createToken('auth_token')->plainTextToken;
+        $token = Auth::guard('provider')->attempt([  
+            'phone' => $request->phone,
+            'password' => $request->password,
+        ]);  
+
+        if (!$token)
+            return $this->returnError('E001', 'بيانات الدخول غير صحيحة');
 
         return response()->json([
             'status' => 200,

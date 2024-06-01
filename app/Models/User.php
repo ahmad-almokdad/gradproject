@@ -39,6 +39,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Order::class, 'user_id');
     }
+
     public function favorites(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(favorites::class,"user_id","id");

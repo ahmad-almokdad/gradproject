@@ -60,7 +60,8 @@ class OrderController extends Controller
     public function index()
     {
         $user = auth('user-api')->user();
-        $orders = $user->orders->with('service')->with('provider')->get();
+        $orders = $user->orders;
+        $orders = $orders->with('service')->with('provider')->get();
         return response()->json([
             'status' => 200,
             'orders' => $orders,

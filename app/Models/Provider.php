@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Provider extends Model implements JWTSubject
+class Provider extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
     protected  $guarded = [];

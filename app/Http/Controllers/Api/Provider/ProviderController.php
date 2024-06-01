@@ -61,10 +61,15 @@ class ProviderController extends Controller
             ]);
         }
 
+
+        $provider->tokens()->delete();
+        $token = $provider->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'status' => 200,
             'message' => 'Provider logged in successfully',
             'data' => $provider,
+            'token' => $token,
         ]);
     }
 }

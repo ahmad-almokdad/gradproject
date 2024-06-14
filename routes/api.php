@@ -55,10 +55,12 @@ Route::group(['prefix' => 'user','namespace'=>'User'], function () {
         Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
         Route::get('/get-providers', [ProviderProviderController::class, 'index']);
         Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
-        Route::post('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
+        Route::get('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
 
+        Route::get('show-review', [ReviewController::class, 'ShowReviewAll'])->middleware('auth:user-api');
         Route::post('add-review', [ReviewController::class, 'CreateReviewRating'])->middleware('auth:user-api');
-        Route::post('store', [ReviewController::class, 'store'])->middleware('auth:user-api');
+        Route::get('get-review', [ReviewController::class, 'GetReview'])->middleware('auth:user-api');
+        Route::post('delete-review', [ReviewController::class, 'DeleteReview'])->middleware('auth:user-api');
 
     Route::post('/logout', [UAuthController::class, 'logout']) -> middleware('auth.guard:user-api');
 

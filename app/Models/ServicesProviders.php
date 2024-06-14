@@ -9,4 +9,11 @@ class ServicesProviders extends Model
 {
     use HasFactory;
     protected  $guarded = [];
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ServicesProviders::class,"provider_id","id");
+    }
 }
+
+

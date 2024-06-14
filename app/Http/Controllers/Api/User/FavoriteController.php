@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
+use App\Models\User;
 use App\Models\favorites;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -15,14 +17,16 @@ class FavoriteController extends Controller
     {
         $this->middleware(["auth:user-api"]);
     }
-   // public function ShowFavorite()
-   // {
-   //     $user = auth('user-api')->user();
-   //     $favorite = $user()->provider_favorites()->get();
-   //     return response([
-    //        "providers"=> $favorite
-   //     ]);
-  //  }
+    public function ShowFavorite()
+    {
+        //$user = auth('user-api')->user();
+        // $favorite = auth('user-api')->user()->provider_favorites;
+        // return auth('user-api')->user()->favorites->load('provider_favorites');
+        return favorites::where('user_id',auth('user-api')->user()->id)->with('provider_favorites')->get();
+        return response([
+       //     "providers"=> $favorite
+        ]);
+    }
 
     public function AddOrRemoveFavorite(Request $request): \Illuminate\Http\JsonResponse
     {

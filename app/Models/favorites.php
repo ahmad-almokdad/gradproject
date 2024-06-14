@@ -47,7 +47,7 @@ class favorites extends Model
  
     public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Provider::class,"provider_id","id")->withDefault();
+        return $this->belongsTo(Provider::class,"provider_id");
     }
     public function users_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

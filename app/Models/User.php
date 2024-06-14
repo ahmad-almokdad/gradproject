@@ -58,17 +58,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
 
-    public function favorite_providers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    {
-        return $this->belongsToMany(
-            Provider::class,
-            "favorites",
-            "user_id",
-            "provider_id",
-            "id",
-            "id",
-        );
-    }
+ 
 
     /**
      * The attributes that should be cast.

@@ -33,5 +33,8 @@ class ReportController extends Controller
             ]);
         }
 
+        $user = auth('user-api')->user();
+        $provider = Provider::where("id",$request->provider_id)->first();
+
     }
 }

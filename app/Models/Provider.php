@@ -23,6 +23,18 @@ class Provider extends Model
 
     public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(review::class,"user_id","id");
+        return $this->hasMany(review::class,"provider_id","id");
+    }
+
+    public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            "favorites",
+            "user_id",
+            "provider_id",
+            "id",
+       //     "id",
+        );
     }
 }

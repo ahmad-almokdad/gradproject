@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\User\UAuthController;
 use App\Http\Controllers\Api\CategoriesController;
 use App\Http\Controllers\Api\Provider\ProviderController as ProviderProviderController;
 use App\Http\Controllers\Api\User\FavoriteController;
+use App\Http\Controllers\Api\User\GetProviderController;
 use App\Http\Controllers\Api\User\OrderController;
 use App\Http\Controllers\Api\User\ReviewController;
 use Illuminate\Http\Request;
@@ -54,6 +55,7 @@ Route::group(['prefix' => 'user','namespace'=>'User'], function () {
         Route::get('orders', [OrderController::class, 'index'])->middleware('auth:user-api');
         Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
         Route::get('/get-providers', [ProviderProviderController::class, 'index']);
+        Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID']);
         Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
         Route::get('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
 

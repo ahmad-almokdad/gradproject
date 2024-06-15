@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Provider extends Model
 {
     use HasFactory;
+    protected $table = 'providers';
     protected  $guarded = [];
+    protected $fillable = [
+        'name' , 'phone' ,'email','address','status','rate', 'created_at' , 'updated_at'
+    ];
     protected $hidden = ['password'];
 
     public function services()
@@ -36,5 +40,9 @@ class Provider extends Model
             "id",
        //     "id",
         );
+    }
+    public function scopeSelection($query)
+    {
+        return $query->select('id','name' , 'phone' ,'email','address','status','rate', 'created_at' , 'updated_at');
     }
 }

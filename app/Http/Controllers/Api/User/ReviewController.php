@@ -79,7 +79,7 @@ class ReviewController extends Controller
                 'errors' => $validate->errors(),
             ]);
         }
-        if($this->CheckCanReview($user,$request->provider_id)===true){
+        if($this->CheckCanReview($user,$request->provider_id)===false){
             $review = review::updateOrCreate([
                 "provider_id"=>$request->provider_id,
                 "user_id"=>$user->id

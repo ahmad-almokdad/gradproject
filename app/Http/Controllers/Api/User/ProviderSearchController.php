@@ -23,7 +23,7 @@ class ProviderSearchController extends Controller
     }
     /**
      * @throws \Illuminate\Validation\ValidationException
-     */
+     *//*
     public function SearchProvider(Request $request): \Illuminate\Http\JsonResponse
     {
         $validate = $this->Validate_IsTrue($request);
@@ -79,3 +79,4 @@ class ProviderSearchController extends Controller
         }
     }
 }
+*/

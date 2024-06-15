@@ -23,6 +23,17 @@ class Provider extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Order::class, 'provider_id');
     }
+    public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            "favorites",
+            "user_id",
+            "provider_id",
+            "id",
+        //     "id",
+        );
+    }
     public function getJWTIdentifier()
     {
         return $this->getKey();

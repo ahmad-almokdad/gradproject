@@ -15,14 +15,14 @@ class FavoriteController extends Controller
     {
         $this->middleware(["auth:user-api"]);
     }
-    public function ShowFavorite()
-    {
-        $user = auth('user-api')->user();
-        $favorite = $user()->provider_favorites()->get();
-        return response([
-            "providers" => $favorite
-        ]);
-    }
+//    public function ShowFavorite()
+//    {
+//        $user = auth('user-api')->user();
+//        $favorite = $user()->provider_favorites()->get();
+//        return response([
+//            "providers" => $favorite
+//        ]);
+//    }
 
     public function AddOrRemoveFavorite(Request $request): \Illuminate\Http\JsonResponse
     {

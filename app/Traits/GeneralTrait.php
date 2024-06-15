@@ -2,7 +2,9 @@
 
 namespace App\Traits;
 
-trait GeneralTrait 
+use Illuminate\Http\Request;
+
+trait GeneralTrait
 {
     public function getCurrentLanguage() {
         return app()->getLocale();
@@ -19,32 +21,59 @@ trait GeneralTrait
 
     public function returnSuccessMessage($msg = "", $errNum = "S000")
     {
-        return [ 
-        'status' => true,
-        'errNum' => $errNum,
-        'msg' => $msg
-    ];
+        return [
+            'status' => true,
+            'errNum' => $errNum,
+            'msg' => $msg
+        ];
     }
 
     public function returnData($key, $value, $msg= "")
     {
         return response()->json([
             'status' => 'true',
-            'errNum' => "0",
+            'errNum' => "S000",
             'msg' => $msg,
             $key => $value
+
         ]);
     }
     public function returnValidationError($code = "E001", $validator)
     {
         return $this->returnError($code, $validator->errors()->first());
     }
+
+
     public function returnCodeAccordingToInput($validator)
     {
         $inputs = array_keys($validator->errors()->toArray());
         $code = $this->getErrorCode($inputs[0]);
         return $code;
     }
+    public function Paginate(string $namedata,$paginate): array
+    {
+        return [
+            $namedata=> $paginate->items(),
+            "current_page" => $paginate->currentPage(),
+            "url_next_page" => $paginate->nextPageUrl(),
+            "url_first_page" => $paginate->path()."?page=1",
+            "url_last_page" => $paginate->path()."?page=".$paginate->lastPage(),
+            "total_pages" => $paginate->lastPage(),
+        ];
+    }
+
+    public function NumberOfValues(Request $request): int
+    {
+        try {
+            if($request->has("num_values")&&is_numeric($request->num_values)&&$request->num_values>0){
+                return $request->num_values;
+            }
+            throw new \Exception("");
+        }catch (\Exception $exception){
+            return 10;
+        }
+    }
+
     public function getErrorCode($input)
     {
         if ($input == "name")

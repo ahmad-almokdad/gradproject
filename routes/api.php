@@ -33,7 +33,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
     Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
         Route::post('/login', [AuthController::class, 'login']);
-        
+
         Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:admin-api');
 
         Route::post('/add-provider', [ProviderController::class, 'add_provider'])->middleware('auth:admin-api');
@@ -62,8 +62,14 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
         //!
         Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
-        Route::post('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
+//        Route::post('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
         Route::post('add-review', [ReviewController::class, 'CreateReviewRating'])->middleware('auth:user-api');
+
+
+        Route::get('show-review', [ReviewController::class, 'ShowReviewAll'])->middleware('auth:user-api');
+        Route::get('get-review', [ReviewController::class, 'GetReview'])->middleware('auth:user-api');
+        Route::post('delete-review', [ReviewController::class, 'DeleteReview'])->middleware('auth:user-api');
+
         //!
         // Route::post('/edit-profile',);
     });
@@ -71,6 +77,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
     Route::group(['prefix' => 'provider', 'namespace' => 'Provider'], function () {
         Route::post('login', [ProviderProviderController::class, 'login']);
         Route::post('add-price', [ProviderOrderController::class, 'addPriceToOrder'])->middleware('auth:provider');
+        Route::get('orders', [ProviderOrderController::class, 'indexByStatus'])->middleware('auth:provider');
         // Route::post('register', [UAuthController::class, 'register']);
         // Route::post('')
 

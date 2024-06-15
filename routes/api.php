@@ -78,6 +78,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('login', [ProviderProviderController::class, 'login']);
         Route::post('add-price', [ProviderOrderController::class, 'addPriceToOrder'])->middleware('auth:provider');
         Route::get('orders', [ProviderOrderController::class, 'indexByStatus'])->middleware('auth:provider');
+        Route::get('profile', [ProviderProviderController::class, 'getProfile'])->middleware('auth:provider');
         // Route::post('register', [UAuthController::class, 'register']);
         // Route::post('')
 

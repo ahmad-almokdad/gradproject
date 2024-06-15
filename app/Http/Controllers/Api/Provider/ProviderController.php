@@ -21,6 +21,7 @@ class ProviderController extends Controller
             'data' => $provider,
         ]);
     }
+
     public function index(Request $request)
     {
         // if request has service_id get provider by service id else return all
@@ -40,6 +41,7 @@ class ProviderController extends Controller
             'data' => $providers,
         ]);
     }
+
     public function login(Request $request)
     {
 

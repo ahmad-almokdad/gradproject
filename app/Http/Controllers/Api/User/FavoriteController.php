@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
+use App\Models\User;
 use App\Models\favorites;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -15,14 +17,16 @@ class FavoriteController extends Controller
     {
         $this->middleware(["auth:user-api"]);
     }
-//    public function ShowFavorite()
-//    {
-//        $user = auth('user-api')->user();
-//        $favorite = $user()->provider_favorites()->get();
-//        return response([
-//            "providers" => $favorite
-//        ]);
-//    }
+    public function ShowFavorite()
+    {
+        //$user = auth('user-api')->user();
+        // $favorite = auth('user-api')->user()->provider_favorites;
+        // return auth('user-api')->user()->favorites->load('provider_favorites');
+        return favorites::where('user_id',auth('user-api')->user()->id)->with('provider_favorites')->get();
+        return response([
+            //     "providers"=> $favorite
+        ]);
+    }
 
     public function AddOrRemoveFavorite(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -33,8 +37,8 @@ class FavoriteController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'provider_id' => 'required',
-                'user_id' => 'required'
+                'provider_id' => 'required|string',
+                'user_id' => 'required|string'
             ]
         );
 
@@ -51,18 +55,20 @@ class FavoriteController extends Controller
             'user_id' => $request->user_id,
             'provider_id' => $request->provider_id
         ])->first();
-        if (!is_null($favorite)) {
+        if(!is_null($favorite)){
             $favorite->delete();
             return response()->json([
-                "message" => "delete favorite"
+                "message"=>"delete favorite"
             ]);
-        } else {
+        }
+        else
+        {
             favorites::create([
-                'user_id' => $request->user_id,
-                'provider_id' => $request->provider_id
+                'user_id'=> $request->user_id,
+                'provider_id'=>$request->provider_id
             ]);
             return response()->json([
-                "message" => "add to favorite"
+                "message"=>"add to favorite"
             ]);
         }
     }

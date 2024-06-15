@@ -62,7 +62,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
         //!
         Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
-//        Route::post('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
+        Route::post('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
         Route::post('add-review', [ReviewController::class, 'CreateReviewRating'])->middleware('auth:user-api');
 
 

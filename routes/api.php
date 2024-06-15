@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Provider\OrderController as ProviderOrderController
 use App\Http\Controllers\Api\Provider\ProviderController as ProviderProviderController;
 use App\Http\Controllers\Api\User\FavoriteController;
 use App\Http\Controllers\Api\User\OrderController;
+use App\Http\Controllers\Api\User\GetProviderController;
 use App\Http\Controllers\Api\User\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
 
 
+
+
         //!
         Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
         Route::get('show-favorites', [FavoriteController::class, 'ShowFavorite'])->middleware('auth:user-api');
@@ -71,6 +74,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('delete-review', [ReviewController::class, 'DeleteReview'])->middleware('auth:user-api');
 
         //!
+        Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID'])->middleware('auth:user-api');
+
         // Route::post('/edit-profile',);
     });
 

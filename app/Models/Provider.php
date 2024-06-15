@@ -14,7 +14,10 @@ class Provider extends Authenticatable implements JWTSubject
     use HasApiTokens, HasFactory, Notifiable;
     protected  $guarded = [];
     protected $hidden = ['password'];
-
+    public function scopeSelection($query)
+    {
+        return $query->select('id','name' , 'phone' ,'email','address','status','rate', 'created_at' , 'updated_at');
+    }
     public function services()
     {
         return $this->belongsToMany(Service::class, 'services_providers');

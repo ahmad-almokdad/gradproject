@@ -11,11 +11,21 @@ use Illuminate\Support\Facades\Validator;
 class ProviderController extends Controller
 {
 
+
+    public function getProfile()
+    {
+        $provider = auth('provider')->user();
+        return response()->json([
+            'status' => 200,
+            'message' => 'Provider fetched successfully',
+            'data' => $provider,
+        ]);
+    }
     public function index(Request $request)
     {
         // if request has service_id get provider by service id else return all
         if ($request->service_id) {
-            //i have services relation in Provider model 
+            //i have services relation in Provider model
             // $providers = Provider::where('service_id', $request->service_id)->get();
             $providers = Provider::whereHas('services', function ($query) use ($request) {
                 $query->where('service_id', $request->service_id);
@@ -63,10 +73,10 @@ class ProviderController extends Controller
         }
 
 
-        $token = Auth::guard('provider')->attempt([  
+        $token = Auth::guard('provider')->attempt([
             'phone' => $request->phone,
             'password' => $request->password,
-        ]);  
+        ]);
 
         if (!$token)
             return $this->returnError('E001', 'بيانات الدخول غير صحيحة');

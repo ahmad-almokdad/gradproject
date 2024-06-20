@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Http\Request;
 
-trait GeneralTrait
+trait GeneralTrait 
 {
     public function getCurrentLanguage() {
         return app()->getLocale();
@@ -21,11 +21,11 @@ trait GeneralTrait
 
     public function returnSuccessMessage($msg = "", $errNum = "S000")
     {
-        return [
-            'status' => true,
-            'errNum' => $errNum,
-            'msg' => $msg
-        ];
+        return [ 
+        'status' => true,
+        'errNum' => $errNum,
+        'msg' => $msg
+    ];
     }
 
     public function returnData($key, $value, $msg= "")

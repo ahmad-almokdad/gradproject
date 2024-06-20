@@ -6,10 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use App\Models\User;
+use App\Models\Service;
 use App\Models\Review;
 use App\Models\ServicesProviders;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\UserNotification;
 use Carbon\Carbon;
@@ -27,7 +30,7 @@ class ReviewController extends Controller
 
     public function ShowReviewAll(Request $request)
     {
-
+       
         try {
             $validate = Validator::make(
                 $request->all(),
@@ -35,14 +38,14 @@ class ReviewController extends Controller
                     'provider_id' => 'required',
                 ]
             );
-
-            if ($validate->fails()) {
-                return response()->json([
-                    'status' => 400,
-                    'errors' => $validate->errors(),
-                ]);
-            }
-            $reviews = review::where("reviews.provider_id",$request->provider_id)
+        
+        if ($validate->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validate->errors(),
+            ]);
+        }
+             $reviews = review::where("reviews.provider_id",$request->provider_id)
                 ->orderBy("reviews.id")
                 ->paginate($this->NumberOfValues($request));
             $reviews = $this->Paginate("reviews",$reviews);
@@ -51,7 +54,7 @@ class ReviewController extends Controller
                 $temp_user = User::where("id",$item->user_id)->first();
                 $item->user = [
                     "name"=> $temp_user->name ?? null,
-                ];
+                    ];
             }
             return \response()->json($reviews);
         }catch (\Exception $exception){
@@ -61,48 +64,58 @@ class ReviewController extends Controller
         }
     }
 
-    public function CreateReviewRating (Request $request) {
+    public function CreateReviewRating (Request $request, Service $service) {
         try {
-            DB::beginTransaction();
-            $user = auth('user-api')->user();
-            $validate = Validator::make(
-                $request->all(),
-                [
-                    'provider_id' => 'required|string',
-                    'rate' => 'required|numeric|min:1|max:5'
-                ]
-            );
-
-            if ($validate->fails()) {
-                return response()->json([
-                    'status' => 400,
-                    'errors' => $validate->errors(),
-                ]);
-            }
-            if($this->CheckCanReview($user,$request->provider_id)===false){
-                $review = review::updateOrCreate([
-                    "provider_id"=>$request->provider_id,
-                    "user_id"=>$user->id
-                ],[
-                    "provider_id"=>$request->provider_id,
-                    "user_id"=>$user->id,
-                    "rate"=>$request->rate
-                ]);
-                $this->UpdateRateProvider($request->provider_id);
-                DB::commit();
-                return \response()->json([
-                    "review" => $review
-                ]);
-            }else{
-                Throw new \Exception("It is not possible to rate the provider since he didn't serve you");
-            }
-        }catch (\Exception $exception){
-            DB::rollBack();
-            return \response()->json([
-                "Error" => $exception->getMessage()
-            ],401);
-
+            // Check if the service has been completed by the user
+        if (!$service->isCompletedByUser(Auth::id())) {
+            return response()->json(['error' => 'Service must be completed before submitting a review'], 400);
         }
+
+        // Check if the user has already submitted a review for the service
+        if (Review::where('id', $service->id)->where('user_id', Auth::id())->exists()) {
+            return response()->json(['error' => 'You have already submitted a review for this service'], 400);
+        }
+        //DB::beginTransaction();
+        $user = auth('user-api')->user();
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'id' => 'required|string',
+                'provider_id' => 'required|string',
+                'rate' => 'required|numeric|min:1|max:5'
+            ]
+        );
+        
+        if ($validate->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validate->errors(),
+            ]);
+        }
+        if($this->CheckCanReview($user,$request->provider_id)===false){
+            $review = review::updateOrCreate([
+                "provider_id"=>$request->provider_id,
+                "user_id"=>$user->id
+            ],[
+                "provider_id"=>$request->provider_id,
+                "user_id"=>$user->id,
+                "rate"=>$request->rate
+            ]);
+            $this->UpdateRateProvider($request->provider_id);
+            DB::commit();
+            return \response()->json([
+                "review" => $review
+            ]);
+        }else{
+            Throw new \Exception("It is not possible to rate the provider since he didn't serve you");
+        }
+    }catch (\Exception $exception){
+        DB::rollBack();
+        return \response()->json([
+            "Error" => $exception->getMessage()
+        ],401);
+            
+      }
     }
 
     public function GetReview(Request $request): \Illuminate\Http\JsonResponse
@@ -151,21 +164,21 @@ class ReviewController extends Controller
             }
             $user = auth()->user();
             $rev = null;
-            $rev = review::where("id",$request->review_id)
-                ->where("provider_id",$request->provider_id)->first();
-            if(is_null($rev)){
-                Throw new \Exception("The Review is Not Found");
-            }
-            $rev->delete();
-            //  }
-            //   else{
-            //      $rev = review::where("id",$request->review_id)
-            //          ->where("provider_id",$request->provider_id)->where("user_id",$user->id)->first();
-            //     if(is_null($rev)){
+               $rev = review::where("id",$request->review_id)
+                    ->where("provider_id",$request->provider_id)->first();
+               if(is_null($rev)){
+                   Throw new \Exception("The Review is Not Found");
+               }
+               $rev->delete();
+          //  }
+         //   else{
+          //      $rev = review::where("id",$request->review_id)
+          //          ->where("provider_id",$request->provider_id)->where("user_id",$user->id)->first();
+           //     if(is_null($rev)){
             //        Throw new \Exception("The Review is Not Found");
-            //   }
+             //   }
             //    $rev->delete();
-            //   }
+         //   }
             $this->UpdateRateProvider($request->provider_id);
             DB::commit();
             return \response()->json([

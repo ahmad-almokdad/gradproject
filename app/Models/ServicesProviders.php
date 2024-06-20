@@ -14,3 +14,5 @@ class ServicesProviders extends Model
         return $this->hasMany(ServicesProviders::class,"provider_id","id");
     }
 }
+
+

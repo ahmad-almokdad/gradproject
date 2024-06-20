@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\User\FavoriteController;
 use App\Http\Controllers\Api\User\OrderController;
 use App\Http\Controllers\Api\User\GetProviderController;
 use App\Http\Controllers\Api\User\ReviewController;
+use App\Http\Controllers\Api\Provider\GetUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -85,6 +86,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('orders', [ProviderOrderController::class, 'indexByStatus'])->middleware('auth:provider');
         Route::get('profile', [ProviderProviderController::class, 'getProfile'])->middleware('auth:provider');
         Route::get('complete-order',[ProviderOrderController::class, 'makeOrderComplete'])->middleware('auth:provider');
+        Route::get('/get-user-id/{id}', [GetUserController::class, 'GetUser_ByID']);
+
         // Route::post('register', [UAuthController::class, 'register']);
         // Route::post('')
 

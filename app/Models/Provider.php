@@ -14,10 +14,8 @@ class Provider extends Authenticatable implements JWTSubject
     use HasApiTokens, HasFactory, Notifiable;
     protected  $guarded = [];
     protected $hidden = ['password'];
-    public function scopeSelection($query)
-    {
-        return $query->select('id','name' , 'phone' ,'email','address','status', 'created_at' , 'updated_at');
-    }
+
+
     public function services()
     {
         return $this->belongsToMany(Service::class, 'services_providers');
@@ -26,6 +24,17 @@ class Provider extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Order::class, 'provider_id');
     }
+
+    public function favorites(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(favorites::class, "provider_id", "id");
+    }
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(review::class, "provider_id", "id");
+    }
+
     public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(
@@ -34,7 +43,7 @@ class Provider extends Authenticatable implements JWTSubject
             "user_id",
             "provider_id",
             "id",
-        //     "id",
+            //     "id",
         );
     }
     public function getJWTIdentifier()
@@ -50,5 +59,23 @@ class Provider extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function scopeSelection($query)
+    {
+        $table = $this->getTable();
+        $columns = $this->getTableColumns($table);
+
+        return $query->select($columns);
+    }
+
+    protected function getTableColumns($table)
+    {
+        $columns = \DB::getSchemaBuilder()->getColumnListing($table);
+
+        // Exclude sensitive columns
+        $excludedColumns = ['password', 'email_verified_at', 'remember_token'];
+
+        return array_diff($columns, $excludedColumns);
     }
 }

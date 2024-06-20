@@ -44,7 +44,7 @@ class favorites extends Model
     ];
     protected  $guarded = [];
     public $timestamps = false;
-
+ 
     public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Provider::class,"provider_id");
@@ -53,5 +53,5 @@ class favorites extends Model
     {
         return $this->belongsTo(User::class,"user_id","id")->withDefault();
     }
-
+    
 }

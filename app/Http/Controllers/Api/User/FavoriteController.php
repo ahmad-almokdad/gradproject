@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use App\Models\User;
 use App\Models\favorites;
+use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 class FavoriteController extends Controller
 {
+    use GeneralTrait;
     public function __construct()
     {
         $this->middleware(["auth:user-api"]);
@@ -24,16 +26,16 @@ class FavoriteController extends Controller
         // return auth('user-api')->user()->favorites->load('provider_favorites');
         return favorites::where('user_id',auth('user-api')->user()->id)->with('provider_favorites')->get();
         return response([
-            //     "providers"=> $favorite
+       //     "providers"=> $favorite
         ]);
     }
 
     public function AddOrRemoveFavorite(Request $request): \Illuminate\Http\JsonResponse
     {
-        //    $validator = Validator::make($request->all(),[
-        //        'provider_id'=>['required',Rule::exists("providers","id")],
-        //        'user_id' => ["required|string"]
-        //      ]);
+    //    $validator = Validator::make($request->all(),[
+    //        'provider_id'=>['required',Rule::exists("providers","id")],
+    //        'user_id' => ["required|string"]
+  //      ]);
         $validate = Validator::make(
             $request->all(),
             [
@@ -41,22 +43,23 @@ class FavoriteController extends Controller
                 'user_id' => 'required|string'
             ]
         );
-
+        
         if ($validate->fails()) {
             return response()->json([
                 'status' => 400,
                 'errors' => $validate->errors(),
             ]);
         }
-        //    if ($validator->fails()) {
-        //    return response()->json([$validator->errors()]);
-        // }
+   //    if ($validator->fails()) {
+    //    return response()->json([$validator->errors()]);
+  // }
         $favorite = favorites::where([
             'user_id' => $request->user_id,
             'provider_id' => $request->provider_id
         ])->first();
         if(!is_null($favorite)){
             $favorite->delete();
+            Provider::where('id', $request->provider_id)->update(['isfavorite' => false]);
             return response()->json([
                 "message"=>"delete favorite"
             ]);
@@ -67,9 +70,12 @@ class FavoriteController extends Controller
                 'user_id'=> $request->user_id,
                 'provider_id'=>$request->provider_id
             ]);
+            Provider::where('id', $request->provider_id)->update(['isfavorite' => true]);
+
             return response()->json([
                 "message"=>"add to favorite"
             ]);
         }
     }
+    
 }

@@ -37,7 +37,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'user_id');
+        return $this->hasMany(Order::class, 'order_id');
     }
 
     public function favorites(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -55,18 +55,32 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(review::class,"user_id","id");
     }
 
-
-    public function favorite_providers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function service()
     {
-        return $this->belongsToMany(
-            Provider::class,
-            "favorites",
-            "user_id",
-            "provider_id",
-            "id",
-            "id",
-        );
+        return $this->belongsTo(Service::class);
     }
+
+    public function scopeSelection($query)
+    {
+       $table = $this->getTable();
+       $columns = $this->getTableColumns($table);
+    
+       return $query->select($columns);
+    }
+
+    protected function getTableColumns($table)
+{
+    $columns = \DB::getSchemaBuilder()->getColumnListing($table);
+    
+    // Exclude sensitive columns
+    $excludedColumns = ['password', 'email_verified_at', 'remember_token'];
+    
+    return array_diff($columns, $excludedColumns);
+}
+
+
+ 
+
     /**
      * The attributes that should be cast.
      *

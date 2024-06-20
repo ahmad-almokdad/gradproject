@@ -97,8 +97,6 @@ Route::group(['middleware' => ['api','checkPassword','checkAdminToken:admin-api'
     Route::get('offers', [CategoriesController::class, 'index']);
 });
 
-Route::get('/users/{user}/providers/{provider}/favorite', [FavoriteController::class, 'isFavorite']);
-
 
 /*Route::middleware('auth:api')->prefix('v1')->group(function() {
     Route::get('/user', function(Request $request) {

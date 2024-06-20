@@ -71,38 +71,11 @@ class FavoriteController extends Controller
                 'provider_id'=>$request->provider_id
             ]);
             Provider::where('id', $request->provider_id)->update(['isfavorite' => true]);
-            
+
             return response()->json([
                 "message"=>"add to favorite"
             ]);
         }
     }
-
-    public function isFavorite(User $user, Provider $provider)
-{
-    if (!$user) {
-        return response()->json(['error' => 'User not found'], 404);
-    }
-    if (!$provider) {
-        return response()->json(['error' => 'Provider not found'], 404);
-    }
-    
-
-    $isFavorite = $user->favorites()->where('provider_id', $provider->id)->exists();
-
-        if(!$isFavorite)
-        {
-            return response()->json(['is_favorite' => $isFavorite]);
-        }
-
-    return response()->json(['is_favorite' => $isFavorite]);
-}
-
-    //    if(!$isFavorite)
-      //  {
-      //      return response()->json(['is_favorite' => $isFavorite]);
-       // }
-
-
     
 }

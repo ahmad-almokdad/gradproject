@@ -113,6 +113,10 @@ class OrderController extends Controller
             'transaction_num' => $res_data['transaction_num'],
             'amount' => $order->total_amount,
         ]);
+        $order->update([
+            'status' => 'processing',
+        ]);
+       
         return response()->json([
             'status' => 200,
             'transaction_num' => $res_data['transaction_num'],

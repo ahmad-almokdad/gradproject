@@ -45,4 +45,24 @@ class OrderController extends Controller
         ]);
     }
 
+    public function makeOrderComplete(Request $request)
+    {
+        $user = auth()->user();
+        $order = $user->orders()->where('id', $request->order_id)->first();
+
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'not found order',
+            ]);
+        }
+
+        $order->status = 'completed';
+        $order->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'order completed successfully',
+        ]);
+    }
+
 }

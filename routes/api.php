@@ -74,7 +74,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('delete-review', [ReviewController::class, 'DeleteReview'])->middleware('auth:user-api');
 
         //!
-        Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID'])->middleware('auth:user-api');
+        Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID']);
 
         // Route::post('/edit-profile',);
     });
@@ -84,6 +84,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('add-price', [ProviderOrderController::class, 'addPriceToOrder'])->middleware('auth:provider');
         Route::get('orders', [ProviderOrderController::class, 'indexByStatus'])->middleware('auth:provider');
         Route::get('profile', [ProviderProviderController::class, 'getProfile'])->middleware('auth:provider');
+        Route::get('complete-order',[ProviderOrderController::class, 'makeOrderComplete'])->middleware('auth:provider');
         // Route::post('register', [UAuthController::class, 'register']);
         // Route::post('')
 

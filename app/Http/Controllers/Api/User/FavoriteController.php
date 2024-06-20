@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use App\Models\User;
 use App\Models\favorites;
+use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 class FavoriteController extends Controller
 {
+    use GeneralTrait;
     public function __construct()
     {
         $this->middleware(["auth:user-api"]);
@@ -57,6 +59,7 @@ class FavoriteController extends Controller
         ])->first();
         if(!is_null($favorite)){
             $favorite->delete();
+            Provider::where('id', $request->provider_id)->update(['isfavorite' => false]);
             return response()->json([
                 "message"=>"delete favorite"
             ]);
@@ -67,9 +70,39 @@ class FavoriteController extends Controller
                 'user_id'=> $request->user_id,
                 'provider_id'=>$request->provider_id
             ]);
+            Provider::where('id', $request->provider_id)->update(['isfavorite' => true]);
+            
             return response()->json([
                 "message"=>"add to favorite"
             ]);
         }
     }
+
+    public function isFavorite(User $user, Provider $provider)
+{
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    if (!$provider) {
+        return response()->json(['error' => 'Provider not found'], 404);
+    }
+    
+
+    $isFavorite = $user->favorites()->where('provider_id', $provider->id)->exists();
+
+        if(!$isFavorite)
+        {
+            return response()->json(['is_favorite' => $isFavorite]);
+        }
+
+    return response()->json(['is_favorite' => $isFavorite]);
+}
+
+    //    if(!$isFavorite)
+      //  {
+      //      return response()->json(['is_favorite' => $isFavorite]);
+       // }
+
+
+    
 }

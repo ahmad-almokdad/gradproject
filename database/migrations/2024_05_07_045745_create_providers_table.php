@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('password');
             $table->tinyInteger('status');
+            $table->boolean('isfavorite')->default(false);
             $table->timestamps();
         });
     }

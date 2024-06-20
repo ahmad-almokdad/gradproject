@@ -6,10 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use App\Models\User;
+use App\Models\Service;
 use App\Models\Review;
 use App\Models\ServicesProviders;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\UserNotification;
 use Carbon\Carbon;
@@ -61,13 +64,23 @@ class ReviewController extends Controller
         }
     }
 
-    public function CreateReviewRating (Request $request) {
+    public function CreateReviewRating (Request $request, Service $service) {
         try {
-        DB::beginTransaction();
+            // Check if the service has been completed by the user
+        if (!$service->isCompletedByUser(Auth::id())) {
+            return response()->json(['error' => 'Service must be completed before submitting a review'], 400);
+        }
+
+        // Check if the user has already submitted a review for the service
+        if (Review::where('id', $service->id)->where('user_id', Auth::id())->exists()) {
+            return response()->json(['error' => 'You have already submitted a review for this service'], 400);
+        }
+        //DB::beginTransaction();
         $user = auth('user-api')->user();
         $validate = Validator::make(
             $request->all(),
             [
+                'id' => 'required|string',
                 'provider_id' => 'required|string',
                 'rate' => 'required|numeric|min:1|max:5'
             ]

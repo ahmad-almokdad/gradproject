@@ -57,6 +57,29 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(review::class,"user_id","id");
     }
 
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+    public function scopeSelection($query)
+    {
+       $table = $this->getTable();
+       $columns = $this->getTableColumns($table);
+    
+       return $query->select($columns);
+    }
+
+    protected function getTableColumns($table)
+{
+    $columns = \DB::getSchemaBuilder()->getColumnListing($table);
+    
+    // Exclude sensitive columns
+    $excludedColumns = ['password', 'email_verified_at', 'remember_token'];
+    
+    return array_diff($columns, $excludedColumns);
+}
+
 
  
 

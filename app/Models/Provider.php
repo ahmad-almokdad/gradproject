@@ -43,6 +43,19 @@ class Provider extends Model
     }
     public function scopeSelection($query)
     {
-        return $query->select('id','name' , 'phone' ,'email','address','status', 'created_at' , 'updated_at');
+       $table = $this->getTable();
+       $columns = $this->getTableColumns($table);
+    
+       return $query->select($columns);
     }
+
+    protected function getTableColumns($table)
+{
+    $columns = \DB::getSchemaBuilder()->getColumnListing($table);
+    
+    // Exclude sensitive columns
+    $excludedColumns = ['password', 'email_verified_at', 'remember_token'];
+    
+    return array_diff($columns, $excludedColumns);
+}
 }

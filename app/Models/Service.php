@@ -17,4 +17,15 @@ class Service extends Model
         }
         return null;
     }
+
+    public function isCompletedByUser($userId)
+    {
+        // Check if the service has been marked as completed by the user
+        return $this->users()->wherePivot('user_id', $userId)->wherePivot('completed', true)->exists();
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'services')->withPivot('completed');
+    }
 }

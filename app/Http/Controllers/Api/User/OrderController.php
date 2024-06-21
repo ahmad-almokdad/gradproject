@@ -59,11 +59,25 @@ class OrderController extends Controller
     }
     public function index(Request $request)
     {
+
+
+
         $user = auth('user-api')->user();
+        if ($request->has('status')) {
+            $orders = $user->orders()->where('status', $request->status)->with('provider')->with('service')->orderBy('id', 'desc')->get();
+        } else {
+            $orders = $user->orders()->with('provider')->with('service')->orderBy('id', 'desc')->get();
+        }
+
+
+
+
+
+
         // $orders = $user->orders;
         // $orders = $orders->with('service')->with('provider')->get();
 
-        $orders = $user->load(['orders.service', 'orders.provider']);
+//        $orders = $user->load(['orders.service', 'orders.provider']);
 
         return response()->json([
             'status' => 200,
@@ -116,7 +130,7 @@ class OrderController extends Controller
         $order->update([
             'status' => 'processing',
         ]);
-       
+
         return response()->json([
             'status' => 200,
             'transaction_num' => $res_data['transaction_num'],

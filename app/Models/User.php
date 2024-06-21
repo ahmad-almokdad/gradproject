@@ -37,7 +37,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'order_id');
+        return $this->hasMany(Order::class, 'user_id');
     }
 
     public function favorites(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -64,22 +64,22 @@ class User extends Authenticatable implements JWTSubject
     {
        $table = $this->getTable();
        $columns = $this->getTableColumns($table);
-    
+
        return $query->select($columns);
     }
 
     protected function getTableColumns($table)
 {
     $columns = \DB::getSchemaBuilder()->getColumnListing($table);
-    
+
     // Exclude sensitive columns
     $excludedColumns = ['password', 'email_verified_at', 'remember_token'];
-    
+
     return array_diff($columns, $excludedColumns);
 }
 
 
- 
+
 
     /**
      * The attributes that should be cast.

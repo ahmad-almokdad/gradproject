@@ -17,6 +17,7 @@ class CreateReviewsTable extends Migration
             $table->id();
             $table->foreignId("provider_id")->constrained("providers","id")->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId("user_id")->constrained("users","id")->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId("order_id")->constrained("orders","id")->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer("rate");
             $table->timestamps();
         });

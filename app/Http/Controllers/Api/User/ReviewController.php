@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use App\Models\User;
-use App\Models\Service;
+use App\Models\Order;
 use App\Models\Review;
 use App\Models\ServicesProviders;
 use Illuminate\Support\Facades\Validator;
@@ -64,24 +64,26 @@ class ReviewController extends Controller
         }
     }
 
-    public function CreateReviewRating (Request $request, Service $service) {
+
+    public function CreateReviewRating (Request $request, Order $order) {
         try {
-            // Check if the service has been completed by the user
-        if (!$service->isCompletedByUser(Auth::id())) {
+            // $userId = auth('user-api')->user()->id;
+            // dd(Auth::id()) ;
+            $orderInfo = Order::findOrFail($request->order_id) ;
+            // Check if the order has been completed by the provider
+        if ($orderInfo->status != 'completed') {
             return response()->json(['error' => 'Service must be completed before submitting a review'], 400);
         }
 
-        // Check if the user has already submitted a review for the service
-        if (Review::where('id', $service->id)->where('user_id', Auth::id())->exists()) {
+        // Check if the user has already submitted a review for the order
+        if (Review::where('id', $order->id)->where('user_id', Auth::id())->exists()) {
             return response()->json(['error' => 'You have already submitted a review for this service'], 400);
         }
-        //DB::beginTransaction();
         $user = auth('user-api')->user();
         $validate = Validator::make(
             $request->all(),
             [
-                'id' => 'required|string',
-                'provider_id' => 'required|string',
+                'order_id' => 'required|string',
                 'rate' => 'required|numeric|min:1|max:5'
             ]
         );
@@ -92,17 +94,18 @@ class ReviewController extends Controller
                 'errors' => $validate->errors(),
             ]);
         }
-        if($this->CheckCanReview($user,$request->provider_id)===false){
+        if($this->CheckCanReview($user,$request->order_id)===true){
             $review = review::updateOrCreate([
-                "provider_id"=>$request->provider_id,
+                "order_id"=>$request->order_id,
                 "user_id"=>$user->id
             ],[
-                "provider_id"=>$request->provider_id,
+                "order_id"=>$request->order_id,
                 "user_id"=>$user->id,
                 "rate"=>$request->rate
             ]);
-            $this->UpdateRateProvider($request->provider_id);
-            DB::commit();
+           
+            $this->UpdateRateProvider($request->order_id);
+            
             return \response()->json([
                 "review" => $review
             ]);
@@ -125,8 +128,8 @@ class ReviewController extends Controller
             $validate = Validator::make(
                 $request->all(),
                 [
-                    'provider_id' => 'required|string',
-                    'rate' => 'required|numeric|min:1|max:5'
+                    'order_id' => 'required|string',
+                  //  'rate' => 'required|numeric|min:1|max:5'
                 ]
             );
             if ($validate->fails()) {
@@ -135,7 +138,7 @@ class ReviewController extends Controller
                     'errors' => $validate->errors(),
                 ]);
             }
-            $review = $user->reviews()->where("reviews.provider_id",$request->provider_id)->first();
+            $review = $user->reviews()->where("reviews.order_id",$request->order_id)->first();
             return \response()->json([
                 "review" => $review
             ]);
@@ -153,7 +156,7 @@ class ReviewController extends Controller
             $validate = Validator::make(
                 $request->all(),
                 [
-                    'provider_id' => 'required|string',
+                    'order_id' => 'required|string',
                     'review_id' => 'required|numeric'
                 ]
             );
@@ -165,7 +168,7 @@ class ReviewController extends Controller
             $user = auth()->user();
             $rev = null;
                $rev = review::where("id",$request->review_id)
-                    ->where("provider_id",$request->provider_id)->first();
+                    ->where("order_id",$request->order_id)->first();
                if(is_null($rev)){
                    Throw new \Exception("The Review is Not Found");
                }
@@ -179,7 +182,7 @@ class ReviewController extends Controller
              //   }
             //    $rev->delete();
          //   }
-            $this->UpdateRateProvider($request->provider_id);
+            $this->UpdateRateProvider($request->order_id); //fix it
             DB::commit();
             return \response()->json([
                 "message" => "Success Delete Reviews"
@@ -192,19 +195,51 @@ class ReviewController extends Controller
         }
     }
 
-    private function UpdateRateProvider($id_prov){
-        $provider = Provider::where("id",$id_prov)->first();
-        if(!$provider){
-            return response()->json(['message'=>'not found'],400);
-        }
-        $avg = review::where("provider_id",$provider->id)->avg("rate");
-        $provider->update([
-            "rate" => $avg
-        ]);
+    private function UpdateRateProvider($orderId){
+       // $provider = Provider::where("id",$id_prov)->first();
+       // if(!$provider){
+        //    return response()->json(['message'=>'not found'],400);
+       // }
+       // $avg = review::where("provider_id",$provider->id)->avg("rate");
+        //$provider->update([
+        //    "rate" => $avg
+        //]);
+    // Retrieve the order
+    $order = Order::findOrFail($orderId);
+
+    // Retrieve the associated provider
+    $provider = $order->provider()->first();
+
+    if ($provider) {
+        // Calculate the average rating for the provider
+        $averageRating = Order::where('provider_id', $provider->id)
+            ->where('status', 'completed')
+            ->avg('rate');
+
+        // Update the provider's rating
+        $provider->rate = $averageRating;
+        $provider->save();
+
+        // Update the order's rating
+        $order->rate = $averageRating;
+        $order->save();
+    } else {
+        // Handle the case when the provider is not found
+        throw new \Exception('Provider not found.');
+    }
+}
+
+    public function CheckCanReview(User $user, $orderId)
+{
+    // Retrieve the order
+    $order = Order::findOrFail($orderId);
+
+    // Check if the order belongs to the user
+    if ($order->user_id !== $user->id) {
+        throw new \Exception("You are not authorized to review this order");
     }
 
-    private function CheckCanReview($user,$id_prov):bool{
-        $temp = $user->Providers()->where("id",$id_prov)->first();
-        return !is_null($temp);
-    }
+    // Check if the provider has completed the order for the user
+    return $order->status =='completed';
+}
 }

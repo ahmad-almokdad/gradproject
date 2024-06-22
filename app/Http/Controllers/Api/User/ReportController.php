@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Provider;
 use App\Models\User;
 use App\Models\Report;
@@ -21,7 +22,7 @@ class ReportController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'provider_id' => 'required|string',
+                'order_id' => 'required|string',
                 'report' => 'required|string'
             ]
         );
@@ -37,4 +38,18 @@ class ReportController extends Controller
         $provider = Provider::where("id",$request->provider_id)->first();
 
     }
+
+    public function CheckCanReport(User $user, $orderId)
+{
+    // Retrieve the order
+    $order = Order::findOrFail($orderId);
+
+    // Check if the order belongs to the user
+    if ($order->user_id !== $user->id) {
+        throw new \Exception("You are not authorized to review this order");
+    }
+
+    // Check if the provider has completed the order for the user
+    return $order->status =='completed';
+}
 }

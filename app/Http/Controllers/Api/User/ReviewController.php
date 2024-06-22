@@ -84,6 +84,7 @@ class ReviewController extends Controller
             $request->all(),
             [
                 'order_id' => 'required|string',
+                'provider_id' => 'required|string',
                 'rate' => 'required|numeric|min:1|max:5'
             ]
         );
@@ -97,9 +98,11 @@ class ReviewController extends Controller
         if($this->CheckCanReview($user,$request->order_id)===true){
             $review = review::updateOrCreate([
                 "order_id"=>$request->order_id,
+                "provider_id"=>$request->provider_id,
                 "user_id"=>$user->id
             ],[
                 "order_id"=>$request->order_id,
+                "provider_id"=>$request->provider_id,
                 "user_id"=>$user->id,
                 "rate"=>$request->rate
             ]);
@@ -212,12 +215,13 @@ class ReviewController extends Controller
 
     if ($provider) {
         // Calculate the average rating for the provider
-        $averageRating = Order::where('provider_id', $provider->id)
-            ->where('status', 'completed')
+        $averageRating = review::where('provider_id', $provider->id)
+            // ->where('status', 'completed')
             ->avg('rate');
-
+           
         // Update the provider's rating
         $provider->rate = $averageRating;
+
         $provider->save();
 
         // Update the order's rating

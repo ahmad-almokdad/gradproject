@@ -225,7 +225,7 @@ class ReviewController extends Controller
         $provider->save();
 
         // Update the order's rating
-        $order->rate = $averageRating;
+        $order->rate = $averageRating ??0 ;
         $order->save();
     } else {
         // Handle the case when the provider is not found

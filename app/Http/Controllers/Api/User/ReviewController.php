@@ -95,7 +95,7 @@ class ReviewController extends Controller
                 'errors' => $validate->errors(),
             ]);
         }
-        $checkIfReviewed = Review::where('user_id',$user->id)->where('order_id',$request->order_id)->exsist();
+        $checkIfReviewed = Review::where('user_id',$user->id)->where('order_id',$request->order_id)->exists();
         if($checkIfReviewed){
             Throw new \Exception("You Are Already Submit Your Review");
         }

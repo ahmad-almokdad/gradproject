@@ -64,9 +64,9 @@ class OrderController extends Controller
 
         $user = auth('user-api')->user();
         if ($request->has('status')) {
-            $orders = $user->orders()->where('status', $request->status)->with('provider')->with('service')->orderBy('id', 'desc')->get();
+            $orders = $user->orders()->where('status', $request->status)->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
         } else {
-            $orders = $user->orders()->with('provider')->with('service')->orderBy('id', 'desc')->get();
+            $orders = $user->orders()->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
         }
 
 

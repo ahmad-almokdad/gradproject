@@ -30,7 +30,7 @@ class ReviewController extends Controller
 
     public function ShowReviewAll(Request $request)
     {
-       
+
         try {
             $validate = Validator::make(
                 $request->all(),
@@ -38,7 +38,7 @@ class ReviewController extends Controller
                     'provider_id' => 'required',
                 ]
             );
-        
+
         if ($validate->fails()) {
             return response()->json([
                 'status' => 400,
@@ -88,7 +88,7 @@ class ReviewController extends Controller
                 'rate' => 'required|numeric|min:1|max:5'
             ]
         );
-        
+
         if ($validate->fails()) {
             return response()->json([
                 'status' => 400,
@@ -106,9 +106,9 @@ class ReviewController extends Controller
                 "user_id"=>$user->id,
                 "rate"=>$request->rate
             ]);
-           
+
             $this->UpdateRateProvider($request->order_id);
-            
+
             return \response()->json([
                 "review" => $review
             ]);
@@ -120,7 +120,7 @@ class ReviewController extends Controller
         return \response()->json([
             "Error" => $exception->getMessage()
         ],401);
-            
+
       }
     }
 
@@ -218,9 +218,9 @@ class ReviewController extends Controller
         $averageRating = review::where('provider_id', $provider->id)
             // ->where('status', 'completed')
             ->avg('rate');
-           
+
         // Update the provider's rating
-        $provider->rate = $averageRating;
+        $provider->rate = $averageRating ?? 0;
 
         $provider->save();
 

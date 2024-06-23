@@ -97,7 +97,7 @@ class ReviewController extends Controller
         }
         $checkIfReviewed = Review::where('user_id',$user->id)->where('order_id',$request->order_id)->exists();
         if($checkIfReviewed){
-            Throw new \Exception("You Are Already Submit Your Review");
+            Throw new \Exception("You Are Already Submit Your Review",code: 400);
         }
         if($this->CheckCanReview($user,$request->order_id)===true){
             $review = review::updateOrCreate([

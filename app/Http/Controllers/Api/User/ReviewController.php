@@ -95,6 +95,10 @@ class ReviewController extends Controller
                 'errors' => $validate->errors(),
             ]);
         }
+        $checkIfReviewed = Review::where('user_id',$user->id)->where('order_id',$request->order_id)->exsists();
+        if($checkIfReviewed){
+            Throw new \Exception("You Are Already Submit Your Review");
+        }
         if($this->CheckCanReview($user,$request->order_id)===true){
             $review = review::updateOrCreate([
                 "order_id"=>$request->order_id,
@@ -212,6 +216,7 @@ class ReviewController extends Controller
 
     // Retrieve the associated provider
     $provider = $order->provider()->first();
+
 
     if ($provider) {
         // Calculate the average rating for the provider

@@ -3,15 +3,84 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\OrderTransaction;
 use App\Models\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProviderController extends Controller
 {
+
+    public function getProviders()
+    {
+        $providers = Provider::all();
+        foreach ($providers as $provider) {
+            $total_amount_of_completed = OrderTransaction::where('provider_id', $provider->id)
+                ->where('order_status', 'completed')
+                ->sum('amount');
+            $total_amount_of_pending = OrderTransaction::where('provider_id', $provider->id)
+                ->where('order_status', 'pending')
+                ->sum('amount');
+            $amount_earned = $total_amount_of_completed * 0.85;
+
+            $provider->total_amount_of_completed = $total_amount_of_completed;
+            $provider->total_amount_of_pending = $total_amount_of_pending;
+            $provider->amount_earned = $amount_earned;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Providers fetched successfully',
+            'data' => $providers,
+        ]);
+    }
+    public function giveMoneyToProvider(Request $request)
+    {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'provider_id' => 'required',
+
+            ]
+        );
+        if ($validate->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validate->errors(),
+            ]);
+        }
+        OrderTransaction::where('provider_id',$request->provider_id)
+            ->where('order_status','completed')
+            ->update(['is_taken',true]);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'successfully',
+        ]);
+    }
+
+    public function getStatistic()
+    {
+        $total_amount_of_completed = OrderTransaction::where('order_status', 'completed')
+            ->sum('amount');
+        $total_amount_of_pending = OrderTransaction::where('order_status', 'pending')
+            ->sum('amount');
+        $amount_earned = $total_amount_of_completed * 0.15;
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Statistic fetched successfully',
+            'data' => [
+                'total_amount_of_completed' => $total_amount_of_completed,
+                'total_amount_of_pending' => $total_amount_of_pending,
+                'amount_earned' => $amount_earned
+            ]
+        ]);
+    }
+
     public function add_provider(Request $request)
     {
-        //add validation 
+        //add validation
         $validate = Validator::make(
             $request->all(),
             [
@@ -32,7 +101,7 @@ class ProviderController extends Controller
             ]);
         }
         //add provider
-        $provider =  Provider::create([
+        $provider = Provider::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -47,6 +116,7 @@ class ProviderController extends Controller
             'message' => 'Provider added successfully',
         ]);
     }
+
     public function changeActiveProvider(Request $request)
     {
 

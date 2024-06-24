@@ -131,7 +131,7 @@ class ReviewController extends Controller
     public function GetReview(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $user = auth()->user();
+            $user = auth('user-api')->user();
             $validate = Validator::make(
                 $request->all(),
                 [

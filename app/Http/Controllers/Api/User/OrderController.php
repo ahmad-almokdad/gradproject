@@ -126,6 +126,7 @@ class OrderController extends Controller
             'order_id' => $order->id,
             'transaction_num' => $res_data['transaction_num'],
             'amount' => $order->total_amount,
+            'provider_id'=>$order->provider_id,
         ]);
         $order->update([
             'status' => 'processing',
@@ -185,6 +186,43 @@ class OrderController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'order approved and paid successfully',
+        ]);
+    }
+
+    public function canceledOrder(Request $request)
+    {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'order_id' => 'required',
+            ]
+        );
+        if ($validate->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => $validate->errors(),
+            ]);
+        }
+        $user = auth('user-api')->user();
+        $order = $user->orders()->where('id', $request->order_id)->first();
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'not found order',
+            ],404);
+        }
+        if($order->status == 'processing' || $order->status == 'completed'){
+            return response()->json([
+                'status' => false,
+                'message' => 'you can not cancel order now',
+            ],403);
+        }
+        $order->status = 'cancelled';
+        $order->cancelled_by = 'user';
+        $order->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'order canceled successfully'
         ]);
     }
 }

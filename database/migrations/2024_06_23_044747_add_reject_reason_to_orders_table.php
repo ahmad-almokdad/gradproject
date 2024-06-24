@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('orders', function (Blueprint $table) {
             $table->string('reject_reason')->nullable();
             $table->string('cancelled_by')->nullable();
+            $table->unsignedBigInteger('provider_id')->nullable()->change();
         });
     }
 

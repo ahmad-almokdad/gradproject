@@ -52,7 +52,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(review::class,"user_id","id");
+        return $this->hasMany(Review::class,"user_id","id");
     }
 
     public function service()

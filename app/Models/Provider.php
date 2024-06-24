@@ -30,6 +30,11 @@ class Provider extends Authenticatable implements JWTSubject
         return $this->hasMany(favorites::class, "provider_id", "id");
     }
 
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'provider_id');
+    }
+
     public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(review::class, "provider_id", "id");

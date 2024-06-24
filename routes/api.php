@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\CheckReportsController;
 use App\Http\Controllers\Api\Admin\ProviderController;
 use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\User\UAuthController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Api\User\OrderController;
 use App\Http\Controllers\Api\User\GetProviderController;
 use App\Http\Controllers\Api\User\ReviewController;
 use App\Http\Controllers\Api\Provider\GetUserController;
+use App\Http\Controllers\Api\User\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -41,12 +43,9 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/add-provider', [ProviderController::class, 'add_provider'])->middleware('auth:admin-api');
         Route::post('assign-services-to-providers', [ProviderController::class, 'assignServiceToProvider'])->middleware('auth:admin-api');
         Route::post('change-active-providers', [ProviderController::class, 'changeActiveProvider'])->middleware('auth:admin-api');
-        Route::get('get-providers', [ProviderController::class, 'getProviders'])->middleware('auth:admin-api');
-        Route::get('get-statistic', [ProviderController::class, 'getStatistic'])->middleware('auth:admin-api');
-        Route::post('give-money-to-provider', [ProviderController::class, 'giveMoneyToProvider'])->middleware('auth:admin-api');
 
         Route::post('/add-service', [ServiceController::class, 'addService']);
-
+        Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin']);
     });
 
     Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {
@@ -78,6 +77,9 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('show-review', [ReviewController::class, 'ShowReviewAll'])->middleware('auth:user-api');
         Route::get('get-review', [ReviewController::class, 'GetReview'])->middleware('auth:user-api');
         Route::post('delete-review', [ReviewController::class, 'DeleteReview'])->middleware('auth:user-api');
+
+        Route::post('add-report', [ReportController::class, 'AddReport'])->middleware('auth:user-api');
+        Route::get('get-report', [ReportController::class, 'GetReport'])->middleware('auth:user-api');
 
         //!
         Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID']);

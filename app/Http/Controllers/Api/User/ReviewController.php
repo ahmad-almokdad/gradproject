@@ -45,7 +45,7 @@ class ReviewController extends Controller
                 'errors' => $validate->errors(),
             ]);
         }
-             $reviews = review::where("reviews.provider_id",$request->provider_id)
+             $reviews = Review::where("reviews.provider_id",$request->provider_id)
                 ->orderBy("reviews.id")
                 ->paginate($this->NumberOfValues($request));
             $reviews = $this->Paginate("reviews",$reviews);
@@ -100,7 +100,7 @@ class ReviewController extends Controller
             Throw new \Exception("You Are Already Submit Your Review",code: 400);
         }
         if($this->CheckCanReview($user,$request->order_id)===true){
-            $review = review::updateOrCreate([
+            $review = Review::updateOrCreate([
                 "order_id"=>$request->order_id,
                 "provider_id"=>$request->provider_id,
                 "user_id"=>$user->id
@@ -174,7 +174,7 @@ class ReviewController extends Controller
             }
             $user = auth()->user();
             $rev = null;
-               $rev = review::where("id",$request->review_id)
+               $rev = Review::where("id",$request->review_id)
                     ->where("order_id",$request->order_id)->first();
                if(is_null($rev)){
                    Throw new \Exception("The Review is Not Found");
@@ -220,7 +220,7 @@ class ReviewController extends Controller
 
     if ($provider) {
         // Calculate the average rating for the provider
-        $averageRating = review::where('provider_id', $provider->id)
+        $averageRating = Review::where('provider_id', $provider->id)
             // ->where('status', 'completed')
             ->avg('rate');
 

@@ -70,10 +70,6 @@ class OrderController extends Controller
         }
 
 
-
-
-
-
         // $orders = $user->orders;
         // $orders = $orders->with('service')->with('provider')->get();
 

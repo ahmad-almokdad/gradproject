@@ -14,10 +14,10 @@ class OrderController extends Controller
         $provider = auth('provider')->user();
         if ($request->has('status')) {
 
-            $orders = $provider->orders()->where('status', $request->status)->with('user')->orderBy('id', 'desc')->get();
+            $orders = $provider->orders()->where('status', $request->status)->with('images')->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->where('status', $request->status)->orderBy('id', 'desc')->get();
         } else {
-            $orders = $provider->orders()->with('user')->orderBy('id', 'desc')->get();
+            $orders = $provider->orders()->with('images')->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->orderBy('id', 'desc')->get();
         }
         return response()->json([

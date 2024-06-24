@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CheckReportsController extends Controller
 {
-    public function getReportsforAdmin()
+    public function getReportsForAdmin()
     {
         // Assuming you have an "admin" role or some other way to identify the admin user
       //  if (Auth::user()->isAdmin()) {
             $reports = Report::with('provider')->get();
-
             return response()->json([
                 'status' => 200,
                 'reports' => $reports,

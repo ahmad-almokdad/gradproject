@@ -24,7 +24,7 @@ class OrderController extends Controller
                 'lat' => 'required|numeric',
                 'long' => 'required|numeric',
                 'images' => 'required',
-                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             ]
         );
         if ($validate->fails()) {
@@ -43,7 +43,7 @@ class OrderController extends Controller
             'lat' => $request->lat,
             'long' => $request->long,
         ]);
-        if ($request->hasFile('images')) {
+//        if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $image->move(public_path('images/orders'), $imageName);
@@ -51,7 +51,7 @@ class OrderController extends Controller
                     'image_url' => $imageName,
                 ]);
             }
-        }
+//        }
         return response()->json([
             'status' => 200,
             'message' => 'Order Created Successfully',

@@ -35,7 +35,7 @@ class OrderController extends Controller
             ]);
         }
         $user = auth('user-api')->user();
-        count(collect($request->file('images')));
+        return count(collect($request->file('images')));
         $order = Order::create([
             'service_id' => $request->service_id,
             'provider_id' => $request->provider_id,

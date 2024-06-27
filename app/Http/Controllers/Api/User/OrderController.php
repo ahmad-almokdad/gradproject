@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderImage;
 use App\Models\OrderTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -44,22 +45,23 @@ class OrderController extends Controller
             'long' => $request->long,
         ]);
 //        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images/orders'), $imageName);
-                $order->images()->create([
-                    'image_url' => $imageName,
-                ]);
-            }
+        foreach ($request->file('images') as $image) {
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/orders'), $imageName);
+            OrderImage::create([
+                'image_url' => $imageName,
+                'order_id' => $order->id,
+            ]);
+        }
 //        }
         return response()->json([
             'status' => 200,
             'message' => 'Order Created Successfully',
         ]);
     }
+
     public function index(Request $request)
     {
-
 
 
         $user = auth('user-api')->user();
@@ -80,6 +82,7 @@ class OrderController extends Controller
             'orders' => $orders,
         ]);
     }
+
     public function approve_order(Request $request)
     {
         $validate = Validator::make(
@@ -109,7 +112,7 @@ class OrderController extends Controller
         ];
         $response = Http::post('http://localhost:8007/api/request-payment', $body);
         // return $response->body();
-        $res_data =  json_decode($response->body(), true);
+        $res_data = json_decode($response->body(), true);
         if ($res_data['error'] != 0) {
             return response()->json([
                 'message' => $res_data['message'],
@@ -122,7 +125,7 @@ class OrderController extends Controller
             'order_id' => $order->id,
             'transaction_num' => $res_data['transaction_num'],
             'amount' => $order->total_amount,
-            'provider_id'=>$order->provider_id,
+            'provider_id' => $order->provider_id,
         ]);
         $order->update([
             'status' => 'processing',
@@ -163,7 +166,7 @@ class OrderController extends Controller
             'otp' => $request->otp,
         ];
         $response = Http::post('http://localhost:8007/api/confirm-payment', $body);
-        $res_data =  json_decode($response->body(), true);
+        $res_data = json_decode($response->body(), true);
         if ($res_data['error'] != 0) {
             return response()->json([
                 'message' => $res_data['message'],
@@ -205,13 +208,13 @@ class OrderController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'not found order',
-            ],404);
+            ], 404);
         }
-        if($order->status == 'processing' || $order->status == 'completed'){
+        if ($order->status == 'processing' || $order->status == 'completed') {
             return response()->json([
                 'status' => false,
                 'message' => 'you can not cancel order now',
-            ],403);
+            ], 403);
         }
         $order->status = 'cancelled';
         $order->cancelled_by = 'user';

@@ -49,7 +49,7 @@ class OrderController extends Controller
 //        if ($request->hasFile('images')) {
 
         foreach ($request->file('images') as $image) {
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imageName = time() . '.'.$image->getClientOriginalName(). $image->getClientOriginalExtension();
             $image->move(public_path('images/orders'), $imageName);
             OrderImage::create([
                 'image_url' => $imageName,

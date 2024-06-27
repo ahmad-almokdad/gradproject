@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\Validator;
 class OrderController extends Controller
 {
 
+
     public function store(Request $request)
     {
         $validate = Validator::make(
             $request->all(),
             [
                 'service_id' => 'required|numeric',
-                'provider_id' => 'required|string',
+//                'provider_id' => 'required|string',
                 'schedule_date' => 'required|date',
                 'problem_description' => 'required',
                 'lat' => 'required|numeric',
@@ -65,20 +66,17 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-
-
         $user = auth('user-api')->user();
-        if ($request->has('status')) {
-            $orders = $user->orders()->where('status', $request->status)->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
-        } else {
-            $orders = $user->orders()->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
+        if($request->with_provider == 1){
+
+            if ($request->has('status')) {
+                $orders = $user->orders()->where('status', $request->status)->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
+            } else {
+                $orders = $user->orders()->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
+            }
+        }else {
+            $orders = $user->orders()->where('provider_id', null)->with('service')->with('images')->orderBy('id', 'desc')->get();
         }
-
-
-        // $orders = $user->orders;
-        // $orders = $orders->with('service')->with('provider')->get();
-
-//        $orders = $user->load(['orders.service', 'orders.provider']);
 
         return response()->json([
             'status' => 200,
@@ -141,6 +139,7 @@ class OrderController extends Controller
             'message' => 'make payment request successfully',
         ]);
     }
+
 
     public function approve_payment_order(Request $request)
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\OrderTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,24 +13,30 @@ class OrderController extends Controller
     public function indexByStatus(Request $request)
     {
         $provider = auth('provider')->user();
-        if ($request->has('status')) {
+        if ($request->with_provider == 1) {
+            if ($request->has('status')) {
 
-            $orders = $provider->orders()->where('status', $request->status)->with('images')->with('user')->orderBy('id', 'desc')->get();
+                $orders = $provider->orders()->where('status', $request->status)->with('images')->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->where('status', $request->status)->orderBy('id', 'desc')->get();
-        } else {
-            $orders = $provider->orders()->with('images')->with('user')->orderBy('id', 'desc')->get();
+            } else {
+                $orders = $provider->orders()->with('images')->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->orderBy('id', 'desc')->get();
+            }
+        }else {
+
+           $orders =  Order::where('provider_id',null)->whereIn('service_id',$provider->services->pluck('id'))->with('user')->with('service')->get();
         }
+
         return response()->json([
             'data' => $orders,
             'status' => true,
         ]);
     }
 
+
     public function addPriceToOrder(Request $request)
     {
         $user = auth('provider')->user();
-
 
         $order = $user->orders->where('id', $request->order_id)->first();
         if (!$order) {

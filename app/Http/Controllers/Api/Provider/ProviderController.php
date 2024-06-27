@@ -32,6 +32,10 @@ class ProviderController extends Controller
         $provider->total_amount_earned = $total_amount_earned;
         $provider->total_amount_of_taken = $total_amount_of_taken * 0.85;
 
+        $provider->number_of_complete_order = OrderTransaction::where('provider_id', $provider->id)
+            ->where('order_status', 'completed')
+            ->count();
+
         return response()->json([
             'status' => 200,
             'message' => 'Provider fetched successfully',

@@ -36,7 +36,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
     Route::post('/change-category-status', [CategoriesController::class, 'changeStatus']);
 
     Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
-        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,5');
 
         Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:admin-api');
 
@@ -53,8 +53,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
     });
 
     Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {
-        Route::post('login', [UAuthController::class, 'login']);
-        Route::post('register', [UAuthController::class, 'register']);
+        Route::post('login', [UAuthController::class, 'login'])->middleware('throttle:5,5');
+        Route::post('register', [UAuthController::class, 'register'])->middleware('throttle:5,5');
 
         Route::get('/get-profile', [UAuthController::class, 'getProfile'])->middleware('auth:user-api');
         Route::post('/edit-profile', [UAuthController::class, 'editProfile'])->middleware('auth:user-api');
@@ -69,7 +69,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
         Route::post('/orders/cancel-order', [OrderController::class, 'canceledOrder'])->middleware('auth:user-api');
 
-
+        Route::get('/orders/offers',[\App\Http\Controllers\OfferController::class,'indexForUser'])->middleware('auth:user-api');
+        Route::post('/orders/approve-offer', [\App\Http\Controllers\OfferController::class, 'approveOffer'])->middleware('auth:user-api');
 
 
         //!
@@ -99,6 +100,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('complete-order',[ProviderOrderController::class, 'makeOrderComplete'])->middleware('auth:provider');
         Route::post('cancel-order',[ProviderOrderController::class,'canceledOrder'])->middleware('auth:provider');
         Route::get('/get-user-id/{id}', [GetUserController::class, 'GetUser_ByID']);
+
+        Route::post('/orders/add-offer',[\App\Http\Controllers\OfferController::class,'store'])->middleware('auth:provider');
 
         // Route::post('register', [UAuthController::class, 'register']);
         // Route::post('')

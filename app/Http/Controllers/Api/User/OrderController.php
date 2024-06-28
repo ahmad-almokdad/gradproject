@@ -70,9 +70,9 @@ class OrderController extends Controller
         if($request->with_provider == 1){
 
             if ($request->has('status')) {
-                $orders = $user->orders()->where('status', $request->status)->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
+                $orders = $user->orders()->whereNotNull('provider_id')->where('status', $request->status)->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
             } else {
-                $orders = $user->orders()->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
+                $orders = $user->orders()->whereNotNull('provider_id')->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
             }
         }else {
             $orders = $user->orders()->where('provider_id', null)->with('service')->with('images')->orderBy('id', 'desc')->get();

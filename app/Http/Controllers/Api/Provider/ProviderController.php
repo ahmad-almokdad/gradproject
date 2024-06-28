@@ -47,14 +47,21 @@ class ProviderController extends Controller
     {
         // if request has service_id get provider by service id else return all
         if ($request->service_id) {
-            //i have services relation in Provider model
-            // $providers = Provider::where('service_id', $request->service_id)->get();
+            // Fetch providers based on the service_id with the count of completed orders
             $providers = Provider::whereHas('services', function ($query) use ($request) {
                 $query->where('service_id', $request->service_id);
-            })->get();
+            })
+            ->withCount(['orders' => function ($query) {
+                $query->where('status', 'completed'); // Only count orders with status 'completed'
+            }])
+            ->get();
         } else {
-            //get all with services
-            $providers = Provider::with('services')->get();
+            // Fetch all providers with services and count of completed orders
+            $providers = Provider::with('services')
+                ->withCount(['orders' => function ($query) {
+                    $query->where('status', 'completed'); // Only count orders with status 'completed'
+                }])
+                ->get();
         }
         return response()->json([
             'status' => 200,

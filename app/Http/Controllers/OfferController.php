@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 
 class OfferController extends Controller
 {
-    public function indexForUser()
+    public function indexForUser(Request $request)
     {
         $user= auth('user-api')->user();
-        $offers = Offer::where('user_id',$user->id)->with('provider')->with('order')->with('service')->get();
+        $offers = Offer::where('order_id',$request->order_id)->where('user_id',$user->id)->with('provider')->with('order')->with('service')->get();
         return response()->json([
             'status' => true,
             'data' => $offers

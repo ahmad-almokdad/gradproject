@@ -75,7 +75,7 @@ class OrderController extends Controller
                 $orders = $user->orders()->whereNotNull('provider_id')->with('provider')->with('service')->with('images')->orderBy('id', 'desc')->get();
             }
         }else {
-            $orders = $user->orders()->where('provider_id', null)->with('service')->with('images')->orderBy('id', 'desc')->get();
+            $orders = $user->orders()->where('provider_id', null)->withCount('offers')->with('service')->with('images')->orderBy('id', 'desc')->get();
         }
 
         return response()->json([

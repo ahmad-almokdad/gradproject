@@ -26,6 +26,10 @@ class Order extends Model
     {
         return $this->belongsTo(Service::class, 'service_id');
     }
+    public function offers()
+    {
+        return $this->hasMany(Offer::class, 'order_id');
+    }
     public function getImageUrlAttribute($value)
     {
         // the image inside public_path('images/services')
@@ -36,7 +40,4 @@ class Order extends Model
         // If the value is empty, return a default or null value
         return null;
     }
-
-      
-
 }

@@ -47,7 +47,7 @@ class favorites extends Model
  
     public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Provider::class,"provider_id")->withCount('orders');
+        return $this->belongsTo(Provider::class,"provider_id")->withCount('orders')->where('status','completed');
     }
     public function users_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

@@ -76,9 +76,9 @@ public function GetReport(Request $request): \Illuminate\Http\JsonResponse
                     'errors' => $validate->errors(),
                 ]);
             }
-            $review = $user->reports()->where("reports.provider_id",$request->provider_id)->first();
+            $report = $user->reports()->where("reports.provider_id",$request->provider_id)->first();
             return \response()->json([
-                "review" => $review
+                "report" => $report
             ]);
         }catch (\Exception $exception){
             return \response()->json([

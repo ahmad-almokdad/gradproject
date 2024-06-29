@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Models\OrderTransaction;
 use App\Models\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,26 @@ class ProviderController extends Controller
     public function getProfile()
     {
         $provider = auth('provider')->user();
+        $total_amount_of_completed = OrderTransaction::where('provider_id', $provider->id)
+            ->where('order_status', 'completed')
+            ->sum('amount');
+        $total_amount_of_pending = OrderTransaction::where('provider_id', $provider->id)
+            ->where('order_status', 'pending')
+            ->sum('amount');
+        $total_amount_earned =$total_amount_of_completed * 0.85;
+        $total_amount_of_taken = OrderTransaction::where('provider_id', $provider->id)
+            ->where('is_taken',true)
+            ->sum('amount');
+
+        $provider->total_amount_of_completed = $total_amount_of_completed;
+        $provider->total_amount_of_pending = $total_amount_of_pending;
+        $provider->total_amount_earned = $total_amount_earned;
+        $provider->total_amount_of_taken = $total_amount_of_taken * 0.85;
+
+        $provider->number_of_complete_order = OrderTransaction::where('provider_id', $provider->id)
+            ->where('order_status', 'completed')
+            ->count();
+
         return response()->json([
             'status' => 200,
             'message' => 'Provider fetched successfully',
@@ -26,14 +47,21 @@ class ProviderController extends Controller
     {
         // if request has service_id get provider by service id else return all
         if ($request->service_id) {
-            //i have services relation in Provider model
-            // $providers = Provider::where('service_id', $request->service_id)->get();
+            // Fetch providers based on the service_id with the count of completed orders
             $providers = Provider::whereHas('services', function ($query) use ($request) {
                 $query->where('service_id', $request->service_id);
-            })->get();
+            })
+            ->withCount(['orders' => function ($query) {
+                $query->where('status', 'completed'); // Only count orders with status 'completed'
+            }])
+            ->get();
         } else {
-            //get all with services
-            $providers = Provider::with('services')->get();
+            // Fetch all providers with services and count of completed orders
+            $providers = Provider::with('services')
+                ->withCount(['orders' => function ($query) {
+                    $query->where('status', 'completed'); // Only count orders with status 'completed'
+                }])
+                ->get();
         }
         return response()->json([
             'status' => 200,

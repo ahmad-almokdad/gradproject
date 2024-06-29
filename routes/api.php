@@ -91,7 +91,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         //!
         Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID']);
 
-        Route::post('/search/{name}', [ProviderSearchController::class, 'providerSearch']);
+        Route::get('/search/{name}', [ProviderSearchController::class, 'providerSearch']);
 
         // Route::post('/edit-profile',);
     });

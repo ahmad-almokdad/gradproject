@@ -43,6 +43,13 @@ class OfferController extends Controller
                 'message' => 'you can not add price to this order because it not pending status',
             ]);
         }
+        $checkIfProviderHasOffer = Offer::where('provider_id', $user->id)->where('order_id', $request->order_id)->first();
+        if ($checkIfProviderHasOffer) {
+            return response()->json([
+                'status' => false,
+                'message' => 'you can not add price to this order because it has offer',
+            ]);
+        }
         Offer::create([
             'total_amount' => $request->price,
             'order_id' => $request->order_id,

@@ -29,6 +29,7 @@ class OrderController extends Controller
                 ->with(['offers' => function ($query) use ($provider) {
                     $query->where('provider_id', $provider->id)->first();
                 }])
+                ->orderBy('id', 'desc')
                 ->get();
         }
 

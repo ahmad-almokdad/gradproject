@@ -27,7 +27,9 @@ class OrderController extends Controller
             $orders = Order::where('provider_id', null)->whereIn('service_id', $provider->services->pluck('id'))->with('user')->with('service')
                 ->with('images')
                 ->with(['offers' => function ($query) use ($provider) {
-                    $query->where('provider_id', $provider->id)->selcet('total_amount')->first();
+                    //get first item
+
+                    $query->where('provider_id', $provider->id)->first();
                 }])
                 ->get();
         }

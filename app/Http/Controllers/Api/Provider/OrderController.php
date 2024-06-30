@@ -27,19 +27,10 @@ class OrderController extends Controller
             $orders = Order::where('provider_id', null)->whereIn('service_id', $provider->services->pluck('id'))->with('user')->with('service')
                 ->with('images')
                 ->with(['offers' => function ($query) use ($provider) {
+
                     $query->where('provider_id', $provider->id)->first();
                 }])
-                ->orderBy('id', 'desc')
                 ->get();
-//            ->map(function($order){
-//                $order->offers = $order->offers->first();
-//                $order->offers = $order->offers ? ['total_amount'=>$order->offers->total_amount]:null;
-//                return $order;
-//            });
-            foreach ($orders as $order){
-                $order->offers = count($order->offers)>0 ? ['total_amount'=>$order->offers[0]->total_amount]:null;
-
-            }
         }
 
         return response()->json([

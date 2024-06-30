@@ -30,7 +30,7 @@ class OrderController extends Controller
                     $query->where('provider_id', $provider->id)->first();
                 }])
                 ->orderBy('id', 'desc')
-                ->get()
+                ->get();
 //            ->map(function($order){
 //                $order->offers = $order->offers->first();
 //                $order->offers = $order->offers ? ['total_amount'=>$order->offers->total_amount]:null;

@@ -51,7 +51,7 @@ class ProviderController extends Controller
         }
         OrderTransaction::where('provider_id',$request->provider_id)
             ->where('order_status','completed')
-            ->update(['is_taken',true]);
+            ->update(['is_taken'=>true]);
 
         return response()->json([
             'status' => 200,

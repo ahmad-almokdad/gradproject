@@ -20,7 +20,7 @@ class OrderController extends Controller
 //            $orders = $provider->orders->where('status', $request->status)->orderBy('id', 'desc')->get();
             } else {
                 $orders = $provider->orders()->with('images')->with(['offers' => function ($query) use ($provider) {
-                    $query->where('provider_id', $provider->id)->first();
+                    $query->where('provider_id', $provider->id)->select('total_amount')->first();
                 }])->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->orderBy('id', 'desc')->get();
             }

@@ -47,15 +47,12 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('get-statistic', [ProviderController::class, 'getStatistic'])->middleware('auth:admin-api');
         Route::post('give-money-to-provider', [ProviderController::class, 'giveMoneyToProvider'])->middleware('auth:admin-api');
 
-        Route::get('get-providers', [ProviderController::class, 'getProviders'])->middleware('auth:admin-api');
-        Route::get('get-statistic', [ProviderController::class, 'getStatistic'])->middleware('auth:admin-api');
-        Route::post('give-money-to-provider', [ProviderController::class, 'giveMoneyToProvider'])->middleware('auth:admin-api');
+
 
         Route::post('/add-service', [ServiceController::class, 'addService']);
-        Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin']);
-        Route::get('/get-provider-id/{id}', [GetProviderIDController::class, 'GetProvider_ByID'])->middleware('auth:admin-api');
-        Route::get('/get-orders', [GetProviderIDController::class, 'getOrders'])->middleware('auth:admin-api');
-        Route::get('/get-reports', [GetProviderIDController::class, 'getReports'])->middleware('auth:admin-api');
+        Route::get('/get-provider-id/{id}', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'GetProvider_ByID'])->middleware('auth:admin-api');
+        Route::get('/get-orders', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getOrders'])->middleware('auth:admin-api');
+        Route::get('/get-reports', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getReports'])->middleware('auth:admin-api');
         Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin'])->middleware('auth:admin-api');
     });
 

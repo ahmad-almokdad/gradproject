@@ -22,7 +22,7 @@ class GetProviderIDController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                // 'provider_id' => 'required|string',        
+                // 'provider_id' => 'required|string',
             ]
         );
 
@@ -70,7 +70,7 @@ class GetProviderIDController extends Controller
     public function getOrders()
     {
         // Retrieve all orders
-        $orders = Order::all();
+        $orders = Order::with('service')->with('user')->with('provider')->get();
 
         // Return the orders as a response
         return response()->json([

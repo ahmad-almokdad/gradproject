@@ -19,13 +19,15 @@ class OrderController extends Controller
                 $orders = $provider->orders()->where('status', $request->status)->with('images')->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->where('status', $request->status)->orderBy('id', 'desc')->get();
             } else {
-                $orders = $provider->orders()->with('images')->with('user')->orderBy('id', 'desc')->get();
+                $orders = $provider->orders()->with('images')->with(['offers' => function ($query) use ($provider) {
+                    $query->where('provider_id', $provider->id)->first();
+                }])->with('user')->orderBy('id', 'desc')->get();
 //            $orders = $provider->orders->orderBy('id', 'desc')->get();
             }
-        }else {
+        } else {
 
-           $orders =  Order::where('provider_id',null)->whereIn('service_id',$provider->services->pluck('id'))->with('user')->with('service')
-               ->with('images')->get();
+            $orders = Order::where('provider_id', null)->whereIn('service_id', $provider->services->pluck('id'))->with('user')->with('service')
+                ->with('images')->get();
         }
 
         return response()->json([

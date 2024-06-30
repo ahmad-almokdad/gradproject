@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    use AdminTrait;
     use GeneralTrait;
 
     public function login(Request $request)
@@ -74,4 +73,3 @@ class AuthController extends Controller
 }
 
     
-

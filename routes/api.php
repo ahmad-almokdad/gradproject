@@ -51,7 +51,9 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
         Route::post('/add-service', [ServiceController::class, 'addService']);
         Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin']);
-        Route::get('/get-provider-id/{id}', [GetProviderIDController::class, 'GetProvider_ByID']);
+        Route::get('/get-provider-id/{id}', [GetProviderIDController::class, 'GetProvider_ByID'])->middleware('auth:admin-api');
+        Route::get('/get-orders', [GetProviderIDController::class, 'getOrders'])->middleware('auth:admin-api');
+        Route::get('/get-reports', [GetProviderIDController::class, 'getReports'])->middleware('auth:admin-api');
     });
 
     Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {

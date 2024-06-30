@@ -9,6 +9,7 @@ use App\Models\Report;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -65,4 +66,29 @@ class GetProviderIDController extends Controller
             'rejected_orders' => $rejectedOrders,
         ]);
     }
+
+    public function getOrders()
+    {
+        // Retrieve all orders
+        $orders = Order::all();
+
+        // Return the orders as a response
+        return response()->json([
+            'status' => 200,
+            'orders' => $orders,
+        ]);
+    }
+
+    public function getReports()
+    {
+        // Retrieve all orders
+        $orders = Report::all();
+
+        // Return the orders as a response
+        return response()->json([
+            'status' => 200,
+            'orders' => $orders,
+        ]);
+    }
 }
+

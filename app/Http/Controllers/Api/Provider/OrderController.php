@@ -33,7 +33,7 @@ class OrderController extends Controller
                 ->get()
             ->map(function($order){
                 $order->offers = $order->offers->first();
-                $order->offers = ['total_amount'=>$order->offers->total_amount]
+                $order->offers = ['total_amount'=>$order->offers->total_amount];
             });
         }
 

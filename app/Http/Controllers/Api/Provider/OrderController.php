@@ -34,6 +34,7 @@ class OrderController extends Controller
             ->map(function($order){
                 $order->offers = $order->offers->first();
                 $order->offers = $order->offers ? ['total_amount'=>$order->offers->total_amount]:null;
+                return $order;
             });
         }
 

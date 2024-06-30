@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CheckReportsController;
+use App\Http\Controllers\Api\Admin\GetAllUserController;
 use App\Http\Controllers\Api\Admin\GetProviderIDController;
 use App\Http\Controllers\Api\Admin\ProviderController;
 use App\Http\Controllers\Api\Admin\ServiceController;
@@ -56,6 +57,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('/get-all-orders', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getOrders'])->middleware('auth:admin-api');
         Route::get('/get-reports', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getReports'])->middleware('auth:admin-api');
         Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin'])->middleware('auth:admin-api');
+        Route::get('/get-users', [GetAllUserController::class, 'GetAllUsers'])->middleware('auth:admin-api');;
     });
 
     Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {

@@ -37,7 +37,7 @@ class OrderController extends Controller
 //                return $order;
 //            });
             foreach ($orders as $order){
-                $order->offers = $order->offers ? ['total_amount'=>$order->offers->total_amount]:null;
+                $order->offers = collect($order->offers)>0 ? ['total_amount'=>$order->offers[0]->total_amount]:null;
 
             }
         }

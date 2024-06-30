@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CheckReportsController;
+use App\Http\Controllers\Api\Admin\GetProviderIDController;
 use App\Http\Controllers\Api\Admin\ProviderController;
 use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\User\UAuthController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Api\User\OrderController;
 use App\Http\Controllers\Api\User\GetProviderController;
 use App\Http\Controllers\Api\User\ReviewController;
 use App\Http\Controllers\Api\Provider\GetUserController;
+use App\Http\Controllers\Api\User\ProviderSearchController;
 use App\Http\Controllers\Api\User\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -51,7 +53,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
         Route::post('/add-service', [ServiceController::class, 'addService']);
         Route::get('/get-provider-id/{id}', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'GetProvider_ByID'])->middleware('auth:admin-api');
-        Route::get('/get-orders', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getOrders'])->middleware('auth:admin-api');
+        Route::get('/get-all-orders', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getOrders'])->middleware('auth:admin-api');
         Route::get('/get-reports', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getReports'])->middleware('auth:admin-api');
         Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin'])->middleware('auth:admin-api');
     });
@@ -92,6 +94,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
 
         //!
         Route::get('/get-provider-id/{id}', [GetProviderController::class, 'GetProvider_ByID']);
+
+        Route::get('/search/{name}', [ProviderSearchController::class, 'providerSearch']);
 
         // Route::post('/edit-profile',);
     });

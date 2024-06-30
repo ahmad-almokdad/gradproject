@@ -128,9 +128,7 @@ class OrderController extends Controller
             'amount' => $order->total_amount,
             'provider_id' => $order->provider_id,
         ]);
-        $order->update([
-            'status' => 'processing',
-        ]);
+
 
         return response()->json([
             'status' => 200,
@@ -181,6 +179,12 @@ class OrderController extends Controller
                 'message' => 'not found  order'
             ], 400);
         }
+
+
+
+        $order->status = 'processing';
+
+
         $order->payment_status = 'paid';
         $order->approve_status = 'approved';
         $order->save();

@@ -29,7 +29,7 @@ class OrderController extends Controller
                 ->with(['offers' => function ($query) use ($provider) {
                     //get first item
 
-                    $query->where('provider_id', $provider->id)->first();
+                    $query->where('provider_id', $provider->id)->first( ['total_amount'] );
                 }])
                 ->get();
         }

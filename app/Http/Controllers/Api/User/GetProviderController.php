@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Provider;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\DB;
@@ -35,15 +36,16 @@ class GetProviderController extends Controller
         {
             return $this->returnError('001', 'this id is not found');
         }
+        $ordersCompleted = Order::where('provider_id', $provider->id)
+            ->where('status', 'completed')
+            ->count();
 
-        return $this->returnData('providers',$provider);
-     //   $provider = Provider::selection()->find($request -> id);
-     //   if(!$provider)
-    //    {
-     //     return $this->returnError('001', 'this id is not found');
-     //   }
-
-      //  return Provider::where('id')->with('getProvider_byid')->get();
+      //  return $this->returnData('providers',$provider);
+      return $this->returnData('data', [
+        'provider' => $provider,
+        'total_orders_completed' => $ordersCompleted,
+    ]);
+     
     }
     
 }

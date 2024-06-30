@@ -24,7 +24,8 @@ class OrderController extends Controller
             }
         }else {
 
-           $orders =  Order::where('provider_id',null)->whereIn('service_id',$provider->services->pluck('id'))->with('user')->with('service')->get();
+           $orders =  Order::where('provider_id',null)->whereIn('service_id',$provider->services->pluck('id'))->with('user')->with('service')
+               ->with('images')->get();
         }
 
         return response()->json([

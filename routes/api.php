@@ -16,7 +16,9 @@ use App\Http\Controllers\Api\User\GetProviderController;
 use App\Http\Controllers\Api\User\ReviewController;
 use App\Http\Controllers\Api\Provider\GetUserController;
 use App\Http\Controllers\Api\User\ProviderSearchController;
+use App\Http\Controllers\Api\User\RecommendProviderController;
 use App\Http\Controllers\Api\User\ReportController;
+use App\Models\ProviderStatistics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +60,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('/get-reports', [\App\Http\Controllers\Api\Admin\GetProviderIDController::class, 'getReports'])->middleware('auth:admin-api');
         Route::get('/reports', [CheckReportsController::class, 'getReportsForAdmin'])->middleware('auth:admin-api');
         Route::get('/get-users', [GetAllUserController::class, 'GetAllUsers'])->middleware('auth:admin-api');;
+        Route::get('/active-providers', [ProviderController::class, 'getActiveProviders'])->middleware('auth:admin-api');
     });
 
     Route::group(['prefix' => 'user', 'namespace' => 'User'], function () {
@@ -73,12 +76,13 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
         Route::post('orders/request-payment', [OrderController::class, 'approve_order'])->middleware(['auth:user-api','throttle:5,5']);
         Route::post('orders/confirm-payment', [OrderController::class, 'approve_payment_order'])->middleware(['auth:user-api','throttle:3,5']);
-        Route::get('/get-providers', [ProviderProviderController::class, 'index']);
+        Route::get('/get-providers', [GetProviderController::class, 'getProvidersForUser']);
         Route::post('/logout', [UAuthController::class, 'logout'])->middleware('auth:user-api');
         Route::post('/orders/cancel-order', [OrderController::class, 'canceledOrder'])->middleware('auth:user-api');
 
         Route::get('/orders/offers',[\App\Http\Controllers\OfferController::class,'indexForUser'])->middleware('auth:user-api');
         Route::post('/orders/approve-offer', [\App\Http\Controllers\OfferController::class, 'approveOffer'])->middleware('auth:user-api');
+        Route::get('/recommend-provider/{providerId}', [RecommendProviderController::class, 'recommendSimilarProviders']);
 
 
         //!
@@ -112,6 +116,8 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('complete-order',[ProviderOrderController::class, 'makeOrderComplete'])->middleware('auth:provider');
         Route::post('cancel-order',[ProviderOrderController::class,'canceledOrder'])->middleware('auth:provider');
         Route::get('/get-user-id/{id}', [GetUserController::class, 'GetUser_ByID']);
+        Route::post('/change-password', [ProviderProviderController::class, 'changePassword'])->middleware('auth:provider');
+       // Route::get('/get-statistics', [ProviderStatistics::class, 'getProviderStatistics'])->middleware('auth:provider');
 
         Route::post('/orders/add-offer',[\App\Http\Controllers\OfferController::class,'store'])->middleware('auth:provider');
 

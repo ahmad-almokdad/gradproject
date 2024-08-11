@@ -16,7 +16,7 @@ class GetProviderController extends Controller
     use GeneralTrait;
 
 
-    public function GetProvider_ByID(Request $request)
+    public function GetProvider_ByID(Request $request, $id)
     {
         $validate = Validator::make(
             $request->all(),
@@ -31,11 +31,16 @@ class GetProviderController extends Controller
             ]);
             
         }
-        $provider = Provider::selection()->find($request -> id);
-        if(!$provider)
-        {
-            return $this->returnError('001', 'this id is not found');
-        }
+       // $provider = Provider::selection()->find($request -> id);
+        //if(!$provider)
+        //{
+        //    return $this->returnError('001', 'this id is not found');
+        //}
+        $provider = Provider::where('id', $id)->where('status', '1')->first();
+
+    if (!$provider) {
+        return response()->json(['error' => 'Provider not found or disabled'], 404);
+    }
         $ordersCompleted = Order::where('provider_id', $provider->id)
             ->where('status', 'completed')
             ->count();
@@ -47,5 +52,12 @@ class GetProviderController extends Controller
     ]);
      
     }
+    public function getProvidersForUser()
+{
+    $providers = Provider::where('status', '1')->get();
+
+    // Return only active providers
+    return response()->json(['providers' => $providers]);
+}
     
 }

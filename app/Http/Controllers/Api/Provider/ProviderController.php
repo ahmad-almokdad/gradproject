@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\OrderTransaction;
 use App\Models\Provider;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class ProviderController extends Controller
 {
+    use GeneralTrait;
 
 
     public function getProfile()
@@ -42,6 +45,31 @@ class ProviderController extends Controller
             'data' => $provider,
         ]);
     }
+    public function changePassword(Request $request)
+{
+    $provider = Provider::find(Auth::guard('provider')->user()->id);
+
+    $validator = Validator::make($request->all(), [
+        'old_password' => 'required',
+        'new_password' => 'required|min:6',
+    ]);
+
+    if ($validator->fails()) {
+        $code = $this->returnCodeAccordingToInput($validator);
+        return $this->returnValidationError($code, $validator);
+    }
+
+    // Verify if the old password matches the hashed password in the database
+    if (!Hash::check($request->old_password, $provider->password)) {
+        return $this->returnError('E001', 'Incorrect current password');
+    }
+
+    // Update the provider's password with the new hashed password
+    $provider->password = bcrypt($request->new_password);
+    $provider->save();
+
+    return $this->returnData('provider', $provider);
+}
 
     public function index(Request $request)
     {

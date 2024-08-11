@@ -230,8 +230,11 @@ class ReviewController extends Controller
         $provider->save();
 
         // Update the order's rating
-        $order->rate = $averageRating ??0 ;
-        $order->save();
+        $review = Review::where('order_id', $order->id)->first();
+            if ($review) {
+                $order->rate = $review->rate;
+                $order->save();
+            }
     } else {
         // Handle the case when the provider is not found
         throw new \Exception('Provider not found.');

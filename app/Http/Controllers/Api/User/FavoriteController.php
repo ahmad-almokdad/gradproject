@@ -19,16 +19,20 @@ class FavoriteController extends Controller
     {
         $this->middleware(["auth:user-api"]);
     }
-    public function ShowFavorite()
-    {
-        //$user = auth('user-api')->user();
-        // $favorite = auth('user-api')->user()->provider_favorites;
-        // return auth('user-api')->user()->favorites->load('provider_favorites');
-        return favorites::where('user_id',auth('user-api')->user()->id)->with('provider_favorites')->get();
-        return response([
-       //     "providers"=> $favorite
-        ]);
-    }
+    public function showFavorite()
+{
+    $userId = auth('user-api')->user()->id;
+
+    // Retrieve the user's favorites, excluding disabled providers
+    $favorites = favorites::where('user_id', $userId)
+        ->whereHas('provider_favorites', function ($query) {
+            $query->where('status', '1');
+        })
+        ->with('provider_favorites')
+        ->get();
+
+    return response()->json(['favorite_providers' => $favorites]);
+}
 
     public function AddOrRemoveFavorite(Request $request): \Illuminate\Http\JsonResponse
     {

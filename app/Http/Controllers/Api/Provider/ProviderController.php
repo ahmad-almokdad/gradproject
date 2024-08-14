@@ -45,6 +45,12 @@ class ProviderController extends Controller
             'data' => $provider,
         ]);
     }
+    public function updateFCMToken(Request $request)
+    {
+        $provider = Provider::find(auth('provider')->user()->id);
+        $provider->fcm_token = $request->fcm_token;
+        $provider->save();
+    }
     public function changePassword(Request $request)
 {
     $provider = Provider::find(Auth::guard('provider')->user()->id);

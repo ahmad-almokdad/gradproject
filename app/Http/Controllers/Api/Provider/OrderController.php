@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderTransaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -74,6 +75,15 @@ class OrderController extends Controller
         }
 
         $order->status = 'completed';
+        if ($order->report_status == 1) {
+            $order->report_status = 2;
+            $order->save();
+            return response()->json([
+                'status' => true,
+                'message' => 'order completed successfully',
+            ]);
+        }
+        $order->finish_date = Carbon::now();
         $order->save();
         $order_transaction = OrderTransaction::where('order_id', $order->id)->first();
         if (!$order_transaction) {

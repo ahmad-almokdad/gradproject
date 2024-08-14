@@ -25,8 +25,15 @@ class UAuthController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
         $user->address = $request->address;
+
         $user->save();
         return $this->returnData('user', $user);
+    }
+    public function updateFCMToken(Request $request)
+    {
+        $user = User::find(Auth::guard('user-api')->user()->id);
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
     }
 
     public function changePassword(Request $request)

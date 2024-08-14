@@ -72,6 +72,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::get('/get-services', [ServiceController::class, 'index']);
         // Route::post('/edit-profile',);
         Route::post('/change-password', [UAuthController::class, 'changePassword'])->middleware('auth:user-api');
+        Route::post('/change-fcm-token', [UAuthController::class, 'updateFCMToken'])->middleware('auth:user-api');
         Route::get('orders', [OrderController::class, 'index'])->middleware('auth:user-api');
         Route::post('orders', [OrderController::class, 'store'])->middleware('auth:user-api');
         Route::post('orders/request-payment', [OrderController::class, 'approve_order'])->middleware(['auth:user-api','throttle:5,5']);
@@ -117,6 +118,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('cancel-order',[ProviderOrderController::class,'canceledOrder'])->middleware('auth:provider');
         Route::get('/get-user-id/{id}', [GetUserController::class, 'GetUser_ByID']);
         Route::post('/change-password', [ProviderProviderController::class, 'changePassword'])->middleware('auth:provider');
+        Route::post('/change-fcm-token', [ProviderProviderController::class, 'updateFCMToken'])->middleware('auth:provider');
        // Route::get('/get-statistics', [ProviderStatistics::class, 'getProviderStatistics'])->middleware('auth:provider');
 
         Route::post('/orders/add-offer',[\App\Http\Controllers\OfferController::class,'store'])->middleware('auth:provider');

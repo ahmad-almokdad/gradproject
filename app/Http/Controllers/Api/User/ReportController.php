@@ -25,7 +25,7 @@ class ReportController extends Controller
             [
                 'provider_id' => 'required|exists:providers,id',
                 'report' => 'required|string',
-                'order_id' => 'required'
+//                'order_id' => 'required'
             ]
         );
 
@@ -47,15 +47,19 @@ class ReportController extends Controller
         $report->report = $reportText;
         $report->user_id = $userId;
         $report->order_id = $request->order_id;
-        $order = Order::where('id',$request->order_id)->where('user_id',$userId)->first();
-        if(!$order){
-            return response()->json([
-                "message"=>"not found order "
-            ],400);
+        if($request->order_id){
+            $order = Order::where('id',$request->order_id)->where('user_id',$userId)->first();
+            if(!$order){
+                return response()->json([
+                    "message"=>"not found order "
+                ],400);
+            }
+            $order->status = "processing";
+            $order->report_status = 1;
+            $order->save();
         }
-        $order->status = "processing";
-        $order->report_status = 1;
-        $order->save();
+
+
 
         $provider->reports()->save($report);
 

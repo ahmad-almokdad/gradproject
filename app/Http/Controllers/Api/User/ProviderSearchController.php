@@ -22,14 +22,17 @@ class ProviderSearchController extends Controller
             $query->where('name', 'like', '%' . $name . '%');
         }
 
-        $providers = $query->select('providers.*', DB::raw('COUNT(orders.id) as completed_orders'))
-            ->leftJoin('orders', 'providers.id', '=', 'orders.provider_id')
-            ->where('orders.status', 'completed')
-            ->groupBy('providers.id')
-            ->orderBy('providers.rate', 'desc')
-            ->orderBy('completed_orders', 'desc')
-            ->take(1)
-            ->get();
+        $providers = $query->withCount(['orders' => function ($query) {
+                $query->where('status', 'completed'); // Only count orders with status 'completed'
+            }])->get();
+//        $providers = $query->select('providers.*', DB::raw('COUNT(orders.id) as completed_orders'))
+//            ->leftJoin('orders', 'providers.id', '=', 'orders.provider_id')
+//            ->where('orders.status', 'completed')
+//            ->groupBy('providers.id')
+//            ->orderBy('providers.rate', 'desc')
+//            ->orderBy('completed_orders', 'desc')
+//            ->take(1)
+//            ->get();
 
         if ($providers->isEmpty()) {
             return response()->json([

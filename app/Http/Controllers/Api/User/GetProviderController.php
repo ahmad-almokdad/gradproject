@@ -21,7 +21,7 @@ class GetProviderController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-          //      'provider_id' => 'required|string',        
+          //      'provider_id' => 'required|string',
             ]
         );
         if ($validate->fails()) {
@@ -29,7 +29,7 @@ class GetProviderController extends Controller
                 'status' => 400,
                 'errors' => $validate->errors(),
             ]);
-            
+
         }
        // $provider = Provider::selection()->find($request -> id);
         //if(!$provider)
@@ -50,14 +50,17 @@ class GetProviderController extends Controller
         'provider' => $provider,
         'total_orders_completed' => $ordersCompleted,
     ]);
-     
-    }
-    public function getProvidersForUser()
-{
-    $providers = Provider::where('status', '1')->get();
 
+    }
+    public function getProvidersForUser(Request $request)
+{
+    if($request->service_id){
+        $providers = Provider::where('status', '1')->where('service_id',$request->service_id)->get();
+    }else{
+        $providers = Provider::where('status', '1')->get();
+    }
     // Return only active providers
     return response()->json(['providers' => $providers]);
 }
-    
+
 }

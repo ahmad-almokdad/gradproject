@@ -14,25 +14,32 @@ class ProviderSearchController extends Controller
 {
     use GeneralTrait;
 
-    public function providerSearch($name)
+    public function providerSearch(Request $request)
     {
-        $query = Provider::query();
+        $name = $request->input('name');
+        $serviceId = $request->input('service_id');
+        $searchByRate = $request->input('search_by_rate', 0);  // 1 for rate, 0 for not searching by rate
+        $searchByOrders = $request->input('search_by_orders', 0);  // 1 for orders, 0 for not searching by orders
 
-        if (!empty($name)) {
-            $query->where('name', 'like', '%' . $name . '%');
-        }
+    $providers = Provider::where('name', 'like', '%' . $name . '%')
+        ->whereHas('services', function ($query) use ($serviceId) {
+            $query->where('services.id', $serviceId);
+        })
+        ->whereHas('orders', function ($query) {
+            $query->where('status', 'completed');
+        });
 
-        $providers = $query->withCount(['orders' => function ($query) {
-                $query->where('status', 'completed'); // Only count orders with status 'completed'
-            }])->get();
-//        $providers = $query->select('providers.*', DB::raw('COUNT(orders.id) as completed_orders'))
-//            ->leftJoin('orders', 'providers.id', '=', 'orders.provider_id')
-//            ->where('orders.status', 'completed')
-//            ->groupBy('providers.id')
-//            ->orderBy('providers.rate', 'desc')
-//            ->orderBy('completed_orders', 'desc')
-//            ->take(1)
-//            ->get();
+    if ($searchByRate == 1 && $searchByOrders == 0) {
+        $providers->orderBy('rate', 'desc');
+    } elseif ($searchByOrders == 1 && $searchByRate == 0) {
+        $providers->withCount(['orders' => function ($query) {
+            $query->where('status', 'completed');
+        }])->orderBy('orders_count', 'desc');
+    } else {
+        $providers->orderBy('rate', 'desc');
+    }
+
+    $providers = $providers->get();
 
         if ($providers->isEmpty()) {
             return response()->json([
@@ -41,11 +48,9 @@ class ProviderSearchController extends Controller
             ], 404);
         }
 
-        $provider = $providers->first();
-
         return response()->json([
             'status' => 200,
-            'provider' => $provider,
+            'providers' => $providers,
         ]);
     }
 }

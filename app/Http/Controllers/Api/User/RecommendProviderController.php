@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Controllers\Controller;
 use App\Models\Provider;
 use App\Models\Order;
-/*
+
 class RecommendProviderController extends Controller
 {
     
-
+/*
     public function recommendSimilarProviders($providerId)
     {
         $selectedProvider = Provider::findOrFail($providerId);
@@ -23,6 +23,6 @@ class RecommendProviderController extends Controller
     
         return response()->json(['recommended_providers' => $recommendedProviders]);
     }
-    
-}
     */
+}
+    

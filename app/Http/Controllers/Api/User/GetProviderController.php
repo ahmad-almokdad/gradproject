@@ -55,7 +55,11 @@ class GetProviderController extends Controller
     public function getProvidersForUser(Request $request)
 {
     if($request->service_id){
-        $providers = Provider::where('status', '1')->where('service_id',$request->service_id)->get();
+        $providers = Provider::where('status', '1')
+            ->whereHas('services', function($query) use ($request) {
+                $query->where('service_id', $request->service_id);
+            })
+            ->get();
     }else{
         $providers = Provider::where('status', '1')->get();
     }

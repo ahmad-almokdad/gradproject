@@ -31,7 +31,28 @@ class FavoriteController extends Controller
         ->with('provider_favorites')
         ->get();
 
-    return response()->json(['favorite_providers' => $favorites]);
+        $favoriteProviders = $favorites->map(function ($favorite) {
+            $provider = $favorite->provider_favorites;
+            $serviceNames = $provider->services->pluck('service_name');
+            $ordersCount = $provider->orders->where('status', 'completed')->count();
+    
+            return [
+                'id' => $provider->id,
+                'name' => $provider->name,
+                'phone' => $provider->phone,
+                'email' => $provider->email,
+                'address' => $provider->address,
+                'status' => $provider->status,
+                'isfavorite' => $provider->isfavorite,
+                'rate' => $provider->rate,
+                'created_at' => $provider->created_at,
+                'updated_at' => $provider->updated_at,
+                'order_count' => $ordersCount,
+                'service_names' => $serviceNames,
+            ];
+        });
+
+    return response()->json(['favorite_providers' => $favoriteProviders ]);
 }
 
     public function AddOrRemoveFavorite(Request $request): \Illuminate\Http\JsonResponse

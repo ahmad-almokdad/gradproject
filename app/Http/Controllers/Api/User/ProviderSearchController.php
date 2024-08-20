@@ -29,8 +29,14 @@ class ProviderSearchController extends Controller
             $query->where('status', 'completed');
         });
 
+        $providers->with(['services' => function ($query) {
+            $query->select('service_name');
+        }]);
+
     if ($searchByRate == 1 && $searchByOrders == 0) {
-        $providers->orderBy('rate', 'desc');
+        $providers->withCount(['orders' => function ($query) {
+            $query->where('status', 'completed');
+        }])->orderBy('orders_count', 'desc');
     } elseif ($searchByOrders == 1 && $searchByRate == 0) {
         $providers->withCount(['orders' => function ($query) {
             $query->where('status', 'completed');
@@ -40,6 +46,25 @@ class ProviderSearchController extends Controller
     }
 
     $providers = $providers->get();
+
+    $providers = $providers->map(function ($provider) {
+        $services = $provider->services->pluck('service_name')->first();
+    
+        return [
+            'id' => $provider->id,
+            'name' => $provider->name,
+            'phone' => $provider->phone,
+            'email' => $provider->email,
+            'address' => $provider->address,
+            'status' => $provider->status,
+            'isfavorite' => $provider->isfavorite,
+            'rate' => $provider->rate,
+            'created_at' => $provider->created_at,
+            'updated_at' => $provider->updated_at,
+            'orders_count' => $provider->orders->where('status', 'completed')->count(),
+            'service_name' => $services,
+        ];
+    });
 
         if ($providers->isEmpty()) {
             return response()->json([

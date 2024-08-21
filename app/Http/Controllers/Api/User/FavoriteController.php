@@ -33,7 +33,8 @@ class FavoriteController extends Controller
 
         $favoriteProviders = $favorites->map(function ($favorite) {
             $provider = $favorite->provider_favorites;
-            $serviceNames = $provider->services->pluck('service_name');
+            //serviceNames = $provider->services->pluck('service_name');
+            $services = $provider->services->pluck('service_name')->first();
             $ordersCount = $provider->orders->where('status', 'completed')->count();
     
             return [
@@ -48,7 +49,7 @@ class FavoriteController extends Controller
                 'created_at' => $provider->created_at,
                 'updated_at' => $provider->updated_at,
                 'order_count' => $ordersCount,
-                'service_names' => $serviceNames,
+                'service_names' => $services,
             ];
         });
 
@@ -120,3 +121,25 @@ public function showFavorite()
     return response()->json(['favorite_providers' => $favorites]);
 }
     */
+/*
+$favoriteProviders = $favorites->map(function ($favorite) {
+            $provider = $favorite->provider_favorites;
+            $serviceNames = $provider->services->pluck('service_name');
+            $ordersCount = $provider->orders->where('status', 'completed')->count();
+    
+            return [
+                'id' => $provider->id,
+                'name' => $provider->name,
+                'phone' => $provider->phone,
+                'email' => $provider->email,
+                'address' => $provider->address,
+                'status' => $provider->status,
+                'isfavorite' => $provider->isfavorite,
+                'rate' => $provider->rate,
+                'created_at' => $provider->created_at,
+                'updated_at' => $provider->updated_at,
+                'order_count' => $ordersCount,
+                'service_names' => $serviceNames,
+            ];
+        });
+        */

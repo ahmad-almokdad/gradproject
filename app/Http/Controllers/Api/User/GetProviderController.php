@@ -58,7 +58,7 @@ class GetProviderController extends Controller
 
         if ($request->service_id) {
             $providersQuery->whereHas('services', function ($query) use ($request) {
-                $query->where('id', $request->service_id);
+                $query->where('services.id', $request->service_id);
             });
         }
 

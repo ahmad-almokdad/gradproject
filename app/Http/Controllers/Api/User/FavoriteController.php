@@ -104,3 +104,19 @@ class FavoriteController extends Controller
     }
     
 }
+/*
+public function showFavorite()
+{
+    $userId = auth('user-api')->user()->id;
+
+    // Retrieve the user's favorites, excluding disabled providers
+    $favorites = favorites::where('user_id', $userId)
+        ->whereHas('provider_favorites', function ($query) {
+            $query->where('status', '1');
+        })
+        ->with('provider_favorites')
+        ->get();
+
+    return response()->json(['favorite_providers' => $favorites]);
+}
+    */

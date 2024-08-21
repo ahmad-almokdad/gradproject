@@ -53,6 +53,43 @@ class GetProviderController extends Controller
 
     }
     public function getProvidersForUser(Request $request)
+    {
+        $providersQuery = Provider::where('status', '1');
+        
+        if ($request->service_id) {
+            $providersQuery->where('service_id', $request->service_id);
+        }
+
+        $providers = $providersQuery->get();
+
+        // Get service names for each provider
+        $providerData = $providers->map(function ($provider) {
+            $serviceNames = $provider->services->pluck('service_name')->all();
+            
+            return [
+                'id' => $provider->id,
+                'name' => $provider->name,
+                'phone' => $provider->phone,
+                'email' => $provider->email,
+                'address' => $provider->address,
+                'status' => $provider->status,
+                'isfavorite' => $provider->isfavorite,
+                'rate' => $provider->rate,
+                'created_at' => $provider->created_at,
+                'updated_at' => $provider->updated_at,
+                'order_count' => $provider->orders()->where('status', 'completed')->count(),
+                'service_names' => $serviceNames,
+            ];
+        });
+
+        // Return only active providers with service names
+        return response()->json(['providers' => $providerData]);
+    }
+
+}
+
+/*
+public function getProvidersForUser(Request $request)
 {
     if($request->service_id){
         $providers = Provider::where('status', '1')
@@ -66,5 +103,4 @@ class GetProviderController extends Controller
     // Return only active providers
     return response()->json(['providers' => $providers]);
 }
-
-}
+    */

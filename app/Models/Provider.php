@@ -37,7 +37,7 @@ class Provider extends Authenticatable implements JWTSubject
 
     public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(review::class, "provider_id", "id");
+        return $this->hasMany(Review::class, "provider_id", "id");
     }
 
     public function provider_favorites(): \Illuminate\Database\Eloquent\Relations\BelongsToMany

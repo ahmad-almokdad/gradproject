@@ -72,6 +72,10 @@ class RecommendProviderController extends Controller
 
         $recommendedProviders = $recommendedProviders->concat($lowerRateProviders);
     }
+    $recommendedProviders->transform(function ($provider) {
+        $provider->rate = number_format($provider->rate, 1);
+        return $provider;
+    });
 
     return response()->json(['recommended_providers' => $recommendedProviders]);
 }

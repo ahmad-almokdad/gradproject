@@ -64,7 +64,7 @@ class GetProviderController extends Controller
 
         // Get service names for each provider
         $providerData = $providers->map(function ($provider) {
-            $serviceNames = $provider->services->pluck('service_name')->all();
+            $serviceNames = $provider->services->pluck('service_name')->first();
             
             return [
                 'id' => $provider->id,
@@ -104,3 +104,25 @@ public function getProvidersForUser(Request $request)
     return response()->json(['providers' => $providers]);
 }
     */
+
+    /*
+    // Get service names for each provider
+        $providerData = $providers->map(function ($provider) {
+            $serviceNames = $provider->services->pluck('service_name')->all();
+            
+            return [
+                'id' => $provider->id,
+                'name' => $provider->name,
+                'phone' => $provider->phone,
+                'email' => $provider->email,
+                'address' => $provider->address,
+                'status' => $provider->status,
+                'isfavorite' => $provider->isfavorite,
+                'rate' => $provider->rate,
+                'created_at' => $provider->created_at,
+                'updated_at' => $provider->updated_at,
+                'order_count' => $provider->orders()->where('status', 'completed')->count(),
+                'service_names' => $serviceNames,
+            ];
+        });
+        */

@@ -85,6 +85,7 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
         Route::post('/orders/approve-offer', [\App\Http\Controllers\OfferController::class, 'approveOffer'])->middleware('auth:user-api');
         Route::get('/recommend-provider/{providerId}', [RecommendProviderController::class, 'recommendSimilarProviders']);
 
+        Route::get('/notifications', [\App\Http\Controllers\Api\AllNotificationController::class, 'indexForUser'])->middleware('auth:user-api');
 
         //!
         Route::post('favorite', [FavoriteController::class, 'AddOrRemoveFavorite'])->middleware('auth:user-api');
@@ -110,6 +111,10 @@ Route::group(['middleware' => ['api'/*,'checkPassword'*/], 'namespace' => 'Api']
     Route::group(['prefix' => 'provider', 'namespace' => 'Provider'], function () {
         Route::post('login', [ProviderProviderController::class, 'login']);
         Route::post('add-price', [ProviderOrderController::class, 'addPriceToOrder'])->middleware('auth:provider');
+
+        Route::get('/notifications', [\App\Http\Controllers\Api\AllNotificationController::class, 'indexForProvider'])->middleware('auth:provider');
+
+
         Route::get('orders', [ProviderOrderController::class, 'indexByStatus'])->middleware('auth:provider');
         Route::get('profile', [ProviderProviderController::class, 'getProfile'])->middleware('auth:provider');
         Route::post('complete-order',[ProviderOrderController::class, 'makeOrderComplete'])->middleware('auth:provider');

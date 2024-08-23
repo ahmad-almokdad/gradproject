@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AllNotification;
 use App\Models\Order;
 use App\Models\OrderImage;
 use App\Models\OrderTransaction;
+use App\Models\Provider;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -57,6 +60,23 @@ class OrderController extends Controller
                 'order_id' => $order->id,
             ]);
         }
+
+
+        if($request->provider_id){
+            $provider_user = Provider::find($request->provider_id);
+            $fcm_title = "Home Care";
+            $fcm_message = "You Have A New Order ". $order->service->service_name;
+            $fcm_sender = new FCMService();
+            $fcm_sender->sendNotification($provider_user->fcm_token,$fcm_title,$fcm_message);
+            AllNotification::create([
+                "title"=>$fcm_title,
+                "message"=>$fcm_message,
+                "provider_id"=>$provider_user->id,
+            ]);
+        }
+
+
+
 //        }
         return response()->json([
             'status' => 200,
@@ -128,6 +148,19 @@ class OrderController extends Controller
             'amount' => $order->total_amount,
             'provider_id' => $order->provider_id,
         ]);
+
+
+            $provider_user = Provider::find($order->provider_id);
+            $fcm_title = "Home Care";
+            $fcm_message = "The User" .$user->name. "Accept Your Offer To Service ". $order->service->service_name;
+            $fcm_sender = new FCMService();
+            $fcm_sender->sendNotification($provider_user->fcm_token,$fcm_title,$fcm_message);
+            AllNotification::create([
+                "title"=>$fcm_title,
+                "message"=>$fcm_message,
+                "provider_id"=>$provider_user->id,
+            ]);
+
 
 
         return response()->json([

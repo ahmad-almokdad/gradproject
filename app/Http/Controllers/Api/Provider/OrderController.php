@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
+use App\Models\AllNotification;
 use App\Models\Order;
 use App\Models\OrderTransaction;
+use App\Models\User;
+use App\Services\FCMService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -55,6 +58,20 @@ class OrderController extends Controller
         $order->total_amount = $request->price;
         $order->approve_status = 'waiting';
         $order->save();
+
+
+        $user_customer = User::find($order->user_id);
+
+        $fcm_title = "Home Care";
+        $fcm_message = "You Have A New Offer from Order Service ". $order->service->service_name;
+        $fcm_sender = new FCMService();
+        $fcm_sender->sendNotification($user_customer->fcm_token,$fcm_title,$fcm_message);
+
+        AllNotification::create([
+            "title"=>$fcm_title,
+            "message"=>$fcm_message,
+            "user_id"=>$user_customer->id,
+        ]);
         return response()->json([
             'status' => true,
             'message' => 'order price updated successfully',
@@ -94,6 +111,21 @@ class OrderController extends Controller
         $order_transaction->order_status = 'completed';
         $order_transaction->save();
 
+
+        $user_customer = User::find($order->user_id);
+
+        $fcm_title = "Home Care";
+        $fcm_message = "The order of service ". $order->service->service_name ." is complete";
+        $fcm_sender = new FCMService();
+        $fcm_sender->sendNotification($user_customer->fcm_token,$fcm_title,$fcm_message);
+
+        AllNotification::create([
+            "title"=>$fcm_title,
+            "message"=>$fcm_message,
+            "user_id"=>$user_customer->id,
+        ]);
+
+
         return response()->json([
             'status' => true,
             'message' => 'order completed successfully',
@@ -124,6 +156,19 @@ class OrderController extends Controller
                 'message' => 'not found order',
             ]);
         }
+
+        $user_customer = User::find($order->user_id);
+
+        $fcm_title = "Home Care";
+        $fcm_message = "The order ". $order->service->service_name ." has been canceled ";
+        $fcm_sender = new FCMService();
+        $fcm_sender->sendNotification($user_customer->fcm_token,$fcm_title,$fcm_message);
+
+        AllNotification::create([
+            "title"=>$fcm_title,
+            "message"=>$fcm_message,
+            "user_id"=>$user_customer->id,
+        ]);
 
         $order->status = 'cancelled';
         $order->reject_reason = $request->reason;

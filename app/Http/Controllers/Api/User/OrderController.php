@@ -65,7 +65,7 @@ class OrderController extends Controller
         if($request->provider_id){
             $provider_user = Provider::find($request->provider_id);
             $fcm_title = "Home Care";
-            $fcm_message = "You Have A New Order ". $order->service->service_name;
+            $fcm_message = "You Have A New Order ". $order->service->service_name??"";
             $fcm_sender = new FCMService();
             $fcm_sender->sendNotification($provider_user->fcm_token,$fcm_title,$fcm_message);
             AllNotification::create([
